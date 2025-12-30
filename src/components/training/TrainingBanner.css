@@ -1,0 +1,55 @@
+.training-banner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+    margin-bottom: 0.25rem;
+}
+
+.banner-pill {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pill-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: flex-start;
+}
+
+.pill-label {
+    font-weight: 700;
+    color: #475569;
+    letter-spacing: 0.01em;
+}
+
+.pill-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.pill-input {
+    width: 96px;
+    padding: 0.35rem 0.5rem;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: right;
+    outline: none;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.pill-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}

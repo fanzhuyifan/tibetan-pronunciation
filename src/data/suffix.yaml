@@ -1,0 +1,73 @@
+- letter: 'ག'
+  suffix: 'k'
+  tone_change:
+    '◌̀': '◌̀'
+    '◌́': '◌̂'
+  comment: "shorter and stronger"
+- letter: 'པ'
+  suffix: 'b'
+  tone_change:
+    '◌̀': '◌̀'
+    '◌́': '◌̂'
+  comment: "shorter and stronger"
+- letter: 'འ'
+- letter: 'ང'
+  suffix: 'ng'
+  tone_change:
+    '◌̀': '◌̅'
+    '◌́': '◌́'
+  comment: "longer and weaker"
+  vowel_change:
+    'a': 'e'
+    'u': "ü"
+    'o': "ö"
+- letter: 'མ'
+  suffix: 'm'
+  tone_change:
+    '◌̀': '◌̅'
+    '◌́': '◌́'
+  comment: "longer and weaker"
+- letter: 'ར'
+  suffix: 'r'
+  tone_change:
+    '◌̀': '◌̅'
+    '◌́': '◌́'
+  comment: "longer and weaker"
+- letter: 'ད'
+  tone_change:
+    '◌̀': '◌̀'
+    '◌́': '◌̂'
+  comment: "shorter and stronger"
+  vowel_change:
+    'a': 'e'
+    'u': "ü"
+    'o': "ö"
+- letter: 'ས'
+  tone_change:
+    '◌̀': '◌̀'
+    '◌́': '◌̂'
+  comment: "shorter and stronger"
+  vowel_change:
+    'a': 'e'
+    'u': "ü"
+    'o': "ö"
+- letter: 'ན'
+  suffix: 'n'
+  tone_change:
+    '◌̀': '◌̅'
+    '◌́': '◌́'
+  comment: "longer and weaker"
+  vowel_change:
+    'a': 'e'
+    'u': "ü"
+    'o': "ö"
+- letter: 'ལ'
+  suffix: 'l'
+  tone_change:
+    '◌̀': '◌̅'
+    '◌́': '◌́'
+  comment: "longer and weaker"
+  vowel_change:
+    'a': 'e'
+    'u': "ü"
+    'o': "ö"

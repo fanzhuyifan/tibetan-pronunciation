@@ -1,0 +1,12 @@
+.syllable-panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 0.5rem 0.5rem;
+    background: #fff;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    text-align: center;
+    width: 100%;
+    gap: 0.75rem;
+        align-items: center;
+        margin: 0 auto;
+}
