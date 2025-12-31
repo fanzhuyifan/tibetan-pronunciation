@@ -3,7 +3,7 @@ import './App.css'
 
 import { useFsrsDeck } from './hooks/useFsrsDeck'
 import TrainingView from './components/training/TrainingView'
-import StatsView from './StatsView'
+import StatsView from './components/stats/StatsView'
 import BrowseView from './BrowseView'
 import HelpView from './HelpView'
 

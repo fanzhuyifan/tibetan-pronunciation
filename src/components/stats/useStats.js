@@ -54,18 +54,39 @@ export const useStats = (cards) => {
         const d = new Date(due)
         d.setHours(0, 0, 0, 0)
         const key = d.getTime()
-        counts.set(key, (counts.get(key) || 0) + 1)
+
+        const dayCounts = counts.get(key) || { total: 0, consonant: 0, vowel: 0, suffix: 0 }
+        dayCounts.total++
+        if (dayCounts[kind] !== undefined) {
+            dayCounts[kind]++
+        }
+        counts.set(key, dayCounts)
     })
 
     const forecastData = []
+    const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
+
     for (let i = 0; i < 14; i++) {
         const d = new Date(today)
         d.setDate(d.getDate() + i)
         const key = d.getTime()
+        const dayCounts = counts.get(key) || { total: 0, consonant: 0, vowel: 0, suffix: 0 }
+
+        let label
+        if (i < 2) {
+            const val = rtf.format(i, 'day')
+            label = val.charAt(0).toUpperCase() + val.slice(1)
+        } else {
+            label = d.toLocaleDateString(undefined, { weekday: 'short' })
+        }
+
         forecastData.push({
             date: d,
-            count: counts.get(key) || 0,
-            label: i === 0 ? 'Today' : i === 1 ? 'Tmrw' : d.toLocaleDateString(undefined, { weekday: 'short' }),
+            count: dayCounts.total,
+            consonant: dayCounts.consonant,
+            vowel: dayCounts.vowel,
+            suffix: dayCounts.suffix,
+            label,
         })
     }
 

@@ -58,6 +58,14 @@
     color: #0f172a;
 }
 
+.stat-subtext {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+    font-weight: 500;
+    display: flex;
+    gap: 0.5rem;
+}
 .chart-container {
     margin-top: 0.5rem;
     background: white;
@@ -112,4 +120,40 @@
     color: #64748b;
     margin-bottom: 4px;
     font-weight: 600;
+}
+.stacked-bar {
+    display: flex;
+    width: 100%;
+    height: 6px;
+    background-color: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 0.75rem;
+}
+
+.stacked-bar-segment {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.legend-container {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
 }
