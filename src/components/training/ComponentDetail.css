@@ -1,76 +1,3 @@
-.syllable-display {
-    margin-top: 0.25rem;
-    font-size: 3rem;
-    font-weight: 800;
-    color: #0f172a;
-    line-height: 1.1;
-    letter-spacing: 0.08em;
-    padding: 0.5rem 0.5rem 2rem;
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 55%, #e0f2fe 100%);
-    border: 1px solid #e2e8f0;
-}
-
-.answer-block {
-    margin-top: 0.25rem;
-    padding: 0.5rem;
-    border: 1px dashed #cbd5e1;
-    border-radius: 12px;
-    background: #f8fafc;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    text-align: left;
-}
-
-.answer-line {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    font-size: 0.98rem;
-}
-
-.answer-line.answer-center {
-    justify-content: center;
-    text-align: center;
-    gap: 0.5rem;
-}
-.answer-ratings {
-    margin: 0.35rem 0 0.25rem;
-}
-
-.answer-reveal {
-    margin-top: 0.75rem;
-    display: flex;
-    justify-content: center;
-}
-.answer-line.components {
-    align-items: center;
-    justify-content: center;
-        flex-direction: column;
-        gap: 0.4rem;
-        text-align: center;
-}
-
-.answer-line.note {
-    align-items: flex-start;
-}
-
-.answer-label {
-    font-weight: 700;
-    color: #475569;
-    letter-spacing: 0.01em;
-}
-
-.answer-value {
-    font-weight: 700;
-    color: #0f172a;
-}
-
 .components-value {
     display: flex;
     flex-wrap: wrap;
@@ -96,6 +23,7 @@
     color: #475569;
     font-size: 0.95rem;
 }
+
 .components-diagram {
     display: flex;
     align-items: flex-start;

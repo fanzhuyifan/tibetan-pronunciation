@@ -1,4 +1,4 @@
-import './Flashcard.css'
+import './FlashcardAnswer.css'
 import RatingControls from './RatingControls'
 import ComponentDetail from './ComponentDetail'
 

@@ -1,6 +1,9 @@
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
+import { State } from 'ts-fsrs'
 import { useTrainingSession } from '../../hooks/useTrainingSession'
-import Flashcard from './Flashcard'
+import FlashcardAnswer from './FlashcardAnswer'
+import FlashcardPrompt from './FlashcardPrompt'
+import MoreTraining from './MoreTraining'
 import TrainingBanner from './TrainingBanner'
 import './TrainingView.css'
 
@@ -14,8 +17,14 @@ function TrainingView({ deck }) {
         trainingStats,
         newCardsToLearn,
         updateNewCardsToLearn,
+        updateReviewAheadDays,
         actions,
     } = useTrainingSession(deck)
+
+    const newCardsAvailable = useMemo(
+        () => Array.from(deck?.stateCards?.values() ?? []).filter((card) => card.state === State.New).length,
+        [deck],
+    )
 
     const handleExport = () => {
         try {
@@ -27,7 +36,8 @@ function TrainingView({ deck }) {
 
             const anchor = document.createElement('a')
             anchor.href = url
-            anchor.download = 'tibetan-deck.yaml'
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+            anchor.download = `tibetan-pronunciation-progress-${timestamp}.yaml`
             anchor.click()
 
             URL.revokeObjectURL(url)
@@ -61,10 +71,8 @@ function TrainingView({ deck }) {
         <main className="syllable-panel">
             <div className="training-header">
                 <TrainingBanner
-                    newCardsToLearn={newCardsToLearn}
                     reviewsDue={trainingStats?.reviewsDue ?? 0}
                     learningCardsDue={trainingStats?.learningCardsDue ?? 0}
-                    onChangeNewCards={updateNewCardsToLearn}
                     onImportClick={handleImportClick}
                     onExportClick={handleExport}
                 />
@@ -78,13 +86,31 @@ function TrainingView({ deck }) {
                 />
             </div>
 
-            <Flashcard
-                card={currentCard}
-                showAnswer={showAnswer}
-                predictedNextDueDates={predictedNextDueDates}
-                onRate={actions.rate}
-                onReveal={actions.reveal}
-            />
+            {currentCard ? (
+                <>
+                    <FlashcardPrompt card={currentCard} />
+                    {showAnswer ? (
+                        <FlashcardAnswer
+                            card={currentCard}
+                            predictedNextDueDates={predictedNextDueDates}
+                            onRate={actions.rate}
+                        />
+                    ) : (
+                        <div className="answer-reveal">
+                            <button className="primary" onClick={actions.reveal} title="Show answer (Space or Enter)">
+                                Show answer
+                            </button>
+                        </div>
+                    )}
+                </>
+            ) : (
+                <MoreTraining
+                    newCardsToLearn={newCardsToLearn}
+                    newCardsAvailable={newCardsAvailable}
+                    onChangeReviewAheadDays={updateReviewAheadDays}
+                    onChangeNewCards={updateNewCardsToLearn}
+                    />
+            )}
         </main>
     )
 }

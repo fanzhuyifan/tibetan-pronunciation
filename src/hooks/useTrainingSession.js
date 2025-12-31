@@ -38,14 +38,16 @@ export function useTrainingSession(deck) {
     const { stateCards: cards, rateMany, getNextSyllable, calculateDueDate } = deck || {}
     const [showAnswer, setShowAnswer] = useState(false)
     const [newCardsToLearn, setNewCardsToLearn] = useState(() => loadNewCardsToLearn())
+    const [reviewAheadDays, setReviewAheadDays] = useState(0)
 
     const factory = useMemo(() => new TibetanSyllableFactory(), [])
 
     const dueDateCutOff = useMemo(() => {
         const date = new Date()
         date.setHours(23, 59, 59, 999)
+        date.setDate(date.getDate() + reviewAheadDays)
         return date
-    }, [])
+    }, [reviewAheadDays])
 
     const dueDatePredicate = useCallback((card) => {
         const dueDate = card.due ? new Date(card.due) : new Date() - 1
@@ -67,6 +69,11 @@ export function useTrainingSession(deck) {
         setNewCardsToLearn(safeValue)
         persistNewCardsToLearn(safeValue)
     }, [persistNewCardsToLearn])
+
+    const updateReviewAheadDays = useCallback((value) => {
+        const safeValue = Number.isFinite(value) && value >= 0 ? value : 0
+        setReviewAheadDays(safeValue)
+    }, [])
 
     const syllable = useMemo(() => {
         if (newCardsToLearn > 0) {
@@ -171,8 +178,8 @@ export function useTrainingSession(deck) {
     return {
         currentCard,
         showAnswer,
-        newCardsToLearn,
         updateNewCardsToLearn,
+        updateReviewAheadDays,
         trainingStats,
         predictedNextDueDates,
         actions: {

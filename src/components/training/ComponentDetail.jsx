@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { consonants, vowels, suffixes } from '../../data/tibetanData'
+import './ComponentDetail.css'
 
 const dataByKind = {
     consonant: consonants,

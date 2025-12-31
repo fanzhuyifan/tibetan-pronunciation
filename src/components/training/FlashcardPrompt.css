@@ -1,0 +1,16 @@
+.syllable-display {
+    margin-top: 0.25rem;
+    font-size: 3rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 0.5rem 2rem;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 55%, #e0f2fe 100%);
+    border: 1px solid #e2e8f0;
+}
