@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { createEmptyCard, fsrs, generatorParameters } from 'ts-fsrs'
+import { parse as parseYaml, stringify as stringifyYaml } from 'yaml'
 import { consonants as defaultConsonants, vowels as defaultVowels, suffixes as defaultSuffixes } from '../data/tibetanData'
 import { storageAvailable } from '../utils'
 
@@ -39,6 +40,17 @@ const serializeDeck = (cards) => Array.from(cards.entries()).map(([id, card]) =>
     card: serializeCard(card),
     kind: idToLetterKind(id)[0] || null,
 }))
+
+/**
+ * Convert persisted card-like data back into Date-aware objects.
+ */
+const hydrateCard = (card) => {
+    if (!card) return card
+    const hydrated = { ...card }
+    if (hydrated.due) hydrated.due = new Date(hydrated.due)
+    if (hydrated.last_review) hydrated.last_review = new Date(hydrated.last_review)
+    return hydrated
+}
 
 
 /**
@@ -80,10 +92,7 @@ const loadDeck = (consonants, vowels, suffixes) => {
         const cardEntries = parsed
             .map(({ id, card }) => {
                 if (!id || !card) return null
-                const hydrated = { ...card }
-                if (hydrated.due) hydrated.due = new Date(hydrated.due)
-                if (hydrated.last_review) hydrated.last_review = new Date(hydrated.last_review)
-                return [id, hydrated]
+                return [id, hydrateCard(card)]
             })
             .filter(Boolean)
 
@@ -179,6 +188,41 @@ export function useFsrsDeck(consonants = defaultConsonants, vowels = defaultVowe
         return result?.card?.due ?? null
     }
 
+    const exportYaml = useCallback(() => {
+        const payload = {
+            version: 1,
+            cards: Array.from(stateCards.entries()).map(([id, card]) => ({
+                id,
+                card: serializeCard(card),
+            })),
+        }
+        return stringifyYaml(payload)
+    }, [stateCards])
+
+    const importYaml = useCallback((yamlText) => {
+        if (!yamlText) return false
+
+        try {
+            const parsed = parseYaml(yamlText)
+            const rows = Array.isArray(parsed?.cards) ? parsed.cards : (Array.isArray(parsed) ? parsed : [])
+            const nextCards = new Map()
+
+            rows.forEach((row) => {
+                const { id, card } = row || {}
+                if (!id || !card) return
+                nextCards.set(id, hydrateCard(card))
+            })
+
+            const ensured = ensureDeck(consonants, vowels, suffixes, nextCards)
+            persistDeck(ensured)
+            setStateCards(ensured)
+            return true
+        } catch (error) {
+            console.warn('Failed to import FSRS deck from YAML', error)
+            return false
+        }
+    }, [consonants, vowels, suffixes, persistDeck])
+
     /**
      * Retrieve the next syllable to drill, returning the primary card and any
      * companion cards needed to form a valid syllable (consonant/vowel/suffix).
@@ -216,5 +260,7 @@ export function useFsrsDeck(consonants = defaultConsonants, vowels = defaultVowe
         rateMany,
         getNextSyllable,
         calculateDueDate,
+        exportYaml,
+        importYaml,
     }
 }
