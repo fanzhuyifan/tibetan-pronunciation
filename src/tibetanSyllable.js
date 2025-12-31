@@ -56,6 +56,14 @@ export const effectiveTone = (baseTone, suffix) => {
     return baseTone
 }
 
+const consonantFromLetter = (letter, consonants) => {
+    return consonants.find((c) => c.letter === letter) || null
+}
+
+const stripWylie = (wylie) => {
+    return wylie.endsWith('a') ? wylie.slice(0, -1) : wylie
+}
+
 const emptyVowel = () => ({ letter: '', wylie: '', pronunciation: '' })
 
 export class TibetanSyllable {
@@ -80,7 +88,7 @@ const findEntry = (entries, field, value) => {
     throw new Error(`No entry with ${field}=${String(value)}`)
 }
 
-export const buildSyllable = (base, vowel, suffix = null) => {
+export const buildSyllable = (base, vowel, suffix = null, consonants = defaultConsonants) => {
     const resolvedVowel = vowel || emptyVowel()
 
     const baseLetter = base.letter || ''
@@ -95,11 +103,11 @@ export const buildSyllable = (base, vowel, suffix = null) => {
     let suffixWylie = ''
 
     if (suffix) {
-        suffixWylie = suffix.wylie || suffix.suffix || ''
+        suffixWylie = stripWylie(consonantFromLetter(suffix.letter, consonants)?.wylie || '')
     }
 
-    if (vowelLetter && baseWylie.endsWith('a')) {
-        baseWylie = baseWylie.slice(0, -1)
+    if (vowelLetter) {
+        baseWylie = stripWylie(baseWylie)
     }
 
     const wylie = `${baseWylie}${vowelWylie}${suffixWylie}`
@@ -138,7 +146,7 @@ export class TibetanSyllableFactory {
         const vowelEntry = vowel ? findEntry(this.vowels, 'letter', vowel) : emptyVowel()
         const suffixEntry = suffix ? findEntry(this.suffixes, 'letter', suffix) : null
 
-        return buildSyllable(base, vowelEntry, suffixEntry)
+        return buildSyllable(base, vowelEntry, suffixEntry, this.consonants)
     }
 
     fromTibetan(syllable) {
@@ -163,7 +171,7 @@ export class TibetanSyllableFactory {
                 suffixLetter = remainder[0]
             }
         }
-        return this.fromParts(baseLetter, { vowel: vowelLetter, suffix: suffixLetter })
+        return this.fromParts(baseLetter, { vowel: vowelLetter, suffix: suffixLetter, consonants: this.consonants })
     }
 
     fromWylie(wylie) {
@@ -175,7 +183,7 @@ export class TibetanSyllableFactory {
         for (const entry of this.consonants) {
             const tok = entry.wylie || ''
             const candidates = new Set([tok])
-            if (tok.endsWith('a')) candidates.add(tok.slice(0, -1))
+            candidates.add(stripWylie(tok))
 
             for (const cand of candidates) {
                 if (wylie.startsWith(cand) && cand.length > bestToken.length) {
@@ -205,7 +213,7 @@ export class TibetanSyllableFactory {
 
             if (remaining) {
                 for (const s of this.suffixes) {
-                    const suffixWylie = s.wylie || s.suffix || ''
+                    const suffixWylie = stripWylie(consonantFromLetter(s.letter, this.consonants)?.wylie || '')
                     if (suffixWylie && remaining === suffixWylie) {
                         suffix = s
                         remaining = ''
@@ -219,32 +227,6 @@ export class TibetanSyllableFactory {
             }
         }
 
-        return buildSyllable(bestEntry, vowel, suffix)
+        return buildSyllable(bestEntry, vowel, suffix, this.consonants)
     }
-}
-
-export const sampleCard = (
-    factory,
-    { includeVowel = true, includeSuffix = true } = {},
-) => {
-    const consonants = factory.consonants
-    const vowels = factory.vowels
-    const suffixes = factory.suffixes
-
-    const empty = emptyVowel()
-
-    const vowelOptions = [empty]
-    if (includeVowel) vowelOptions.push(...vowels)
-
-    const suffixOptions = [null]
-    if (includeSuffix) suffixOptions.push(...suffixes)
-
-    const base = pick(consonants)
-    const vowel = pick(vowelOptions)
-    const suffix = pick(suffixOptions)
-
-    const vowelLetter = vowel.letter || ''
-    const suffixLetter = suffix?.letter || ''
-
-    return factory.fromParts(base.letter, { vowel: vowelLetter, suffix: suffixLetter })
 }

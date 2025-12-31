@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { TibetanSyllableFactory, sampleCard } from './tibetanSyllable'
+import { TibetanSyllableFactory } from './tibetanSyllable'
 
 const DATA_VOWELS = [
     ['ི', 'i'],
@@ -115,9 +115,9 @@ describe('TibetanSyllableFactory', () => {
         })
         assertRoundtrip({
             base: 'ཁ',
-            suffixLetter: 'ན',
-            expectedWylie: 'khan',
-            expectedPron: 'ke\u0305n',
+            suffixLetter: 'བ',
+            expectedWylie: 'khab',
+            expectedPron: 'ka\u0300b',
         })
         assertRoundtrip({
             base: 'ག',
@@ -146,41 +146,23 @@ describe('TibetanSyllableFactory', () => {
         }
     })
 
-    it('sampleCard picks consonant-only when no vowel/suffix', () => {
-        for (let i = 0; i < 1000; i += 1) {
-            const card = sampleCard(factory, { includeVowel: false, includeSuffix: false })
-            expect(card.vowel).toBeNull()
-            expect(card.suffix).toBeNull()
+    it('silent suffix roundtrip', () => {
+        const cases = [
+            ['', 'a', 'ge\u0300'],
+            ['ེ', 'e', 'ge\u0300'],
+            ['ི', 'i', 'gi\u0300'],
+            ['ོ', 'o', 'gö\u0300'],
+            ['ུ', 'u', 'gü\u0300'],
+        ]
+
+        for (const [vowelLetter, vowelWylie, expectedPron] of cases) {
+            assertRoundtrip({
+                base: 'ཀ',
+                vowelLetter,
+                suffixLetter: 'ས',
+                expectedWylie: `k${vowelWylie}s`,
+                expectedPron,
+            })
         }
-    })
-
-    it('sampleCard can include suffix when enabled', () => {
-        let sawSuffix = false
-
-        for (let i = 0; i < 1000; i += 1) {
-            const card = sampleCard(factory, { includeVowel: false, includeSuffix: true })
-            expect(card.vowel).toBeNull()
-            if (card.suffix) sawSuffix = true
-        }
-
-        expect(sawSuffix).toBe(true)
-    })
-
-    it('sampleCard can use vowels when included', () => {
-        let sawVowel = false
-        let sawNoVowel = false
-
-        for (let i = 0; i < 1000; i += 1) {
-            const card = sampleCard(factory, { includeVowel: true, includeSuffix: false })
-            if (card.vowel) {
-                sawVowel = true
-            } else {
-                sawNoVowel = true
-            }
-            expect(card.suffix).toBeNull()
-        }
-
-        expect(sawVowel).toBe(true)
-        expect(sawNoVowel).toBe(true)
     })
 })
