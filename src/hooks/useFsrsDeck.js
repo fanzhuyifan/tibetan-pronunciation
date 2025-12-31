@@ -58,17 +58,14 @@ const hydrateCard = (card) => {
  * existing cards so scheduled intervals are preserved.
  */
 const ensureDeck = (consonants, vowels, suffixes, existingCards) => {
-    const cards = new Map(existingCards)
-
+    const cards = new Map()
 
     const addLetters = (items = [], kind) => {
         items.forEach((item) => {
             const letter = item?.letter
             if (!letter) return
             const id = letterKindToId(letter, kind)
-            if (!cards.has(id)) {
-                cards.set(id, createEmptyCard())
-            }
+            cards.set(id, existingCards.get(id) || createEmptyCard())
         })
     }
 
