@@ -2,6 +2,8 @@ import ExportIcon from './icons/ExportIcon'
 import ImportIcon from './icons/ImportIcon'
 import './TrainingBanner.css'
 
+const NEW_CARD_OPTIONS = Array.from({ length: 21 }, (_, index) => index)
+
 function TrainingBanner({
     newCardsToLearn = 0,
     reviewsDue = 0,
@@ -18,6 +20,9 @@ function TrainingBanner({
         }
     }
 
+    const safeNewCardsValue = Number.isFinite(newCardsToLearn) ? newCardsToLearn : 0
+    const hasCustomValue = !NEW_CARD_OPTIONS.includes(safeNewCardsValue)
+
     return (
         <div className="training-banner" aria-label="Training stats">
             <div className="banner-row banner-row--labels">
@@ -30,7 +35,7 @@ function TrainingBanner({
                 >
                     <ImportIcon />
                 </button>
-                <div className="banner-label">New cards</div>
+                <div className="banner-label">New</div>
                 <div className="banner-label">Learning</div>
                 <div className="banner-label">Review</div>
             </div>
@@ -46,15 +51,23 @@ function TrainingBanner({
                     <ExportIcon />
                 </button>
 
-                <input
-                    className="pill-input"
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={newCardsToLearn ?? 0}
+                <select
+                    className="pill-input pill-select"
+                    value={String(safeNewCardsValue)}
                     onChange={handleChange}
                     aria-label="Set number of new cards to learn"
-                />
+                >
+                    {NEW_CARD_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                    {hasCustomValue ? (
+                        <option value={safeNewCardsValue}>
+                            Custom ({safeNewCardsValue})
+                        </option>
+                    ) : null}
+                </select>
 
                 <div className="pill-value" aria-label="Learning cards due">
                     {learningCardsDue ?? 0}

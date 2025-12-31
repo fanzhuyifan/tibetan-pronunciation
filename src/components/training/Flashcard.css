@@ -1,10 +1,3 @@
-.syllable-meta {
-    font-size: 0.95rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #475569;
-}
-
 .syllable-display {
     margin-top: 0.25rem;
     font-size: 3rem;
@@ -46,9 +39,21 @@
     text-align: center;
     gap: 0.5rem;
 }
+.answer-ratings {
+    margin: 0.35rem 0 0.25rem;
+}
+
+.answer-reveal {
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: center;
+}
 .answer-line.components {
     align-items: center;
-    flex-wrap: wrap;
+    justify-content: center;
+        flex-direction: column;
+        gap: 0.4rem;
+        text-align: center;
 }
 
 .answer-line.note {
@@ -90,4 +95,97 @@
     margin: 0 0.4rem;
     color: #475569;
     font-size: 0.95rem;
+}
+.components-diagram {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.component-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.component-tile {
+    min-width: 110px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: linear-gradient(160deg, #fff 0%, #f8fafc 60%, #eef2ff 100%);
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.component-tile.vowel {
+    background: linear-gradient(160deg, #fefce8 0%, #fffbeb 60%, #fef3c7 100%);
+}
+
+.component-tile.consonant {
+    background: linear-gradient(160deg, #e0f2fe 0%, #e0f7ff 60%, #dbeafe 100%);
+}
+
+.component-tile.suffix {
+    background: linear-gradient(160deg, #f3e8ff 0%, #f5f3ff 60%, #ede9fe 100%);
+}
+
+.component-tile:hover,
+.component-tile.is-active {
+    border-color: #818cf8;
+    box-shadow: 0 10px 30px rgba(51, 65, 85, 0.12);
+    transform: translateY(-2px);
+}
+
+.component-title {
+    display: block;
+    font-size: 0.85rem;
+    color: #475569;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.component-letter-large {
+    display: block;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+}
+
+.component-detail {
+    margin-top: 0.35rem;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.component-detail-title {
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 0.15rem;
+}
+
+.component-detail-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.25rem 0.75rem;
+}
+
+.component-detail-row {
+    display: contents;
+}
+
+.component-detail-row dt {
+    font-weight: 600;
+    color: #475569;
+}
+
+.component-detail-row dd {
+    margin: 0;
+    color: #0f172a;
 }

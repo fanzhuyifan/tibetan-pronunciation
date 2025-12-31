@@ -59,7 +59,7 @@ export const effectiveTone = (baseTone, suffix) => {
 const emptyVowel = () => ({ letter: '', wylie: '', pronunciation: '' })
 
 export class TibetanSyllable {
-    constructor({ letter, wylie, pronunciation, tone, consonant, vowel, suffix, suffixComment }) {
+    constructor({ letter, wylie, pronunciation, tone, consonant, vowel, suffix }) {
         this.letter = letter
         this.wylie = wylie
         this.pronunciation = pronunciation
@@ -67,7 +67,6 @@ export class TibetanSyllable {
         this.consonant = consonant
         this.vowel = vowel || null
         this.suffix = suffix || null
-        this.suffixComment = suffixComment || null
     }
 
     toString() {
@@ -123,7 +122,6 @@ export const buildSyllable = (base, vowel, suffix = null) => {
         consonant: baseLetter,
         vowel: vowelLetter || null,
         suffix: suffixLetter || null,
-        suffixComment: suffix?.comment || null,
     })
 }
 

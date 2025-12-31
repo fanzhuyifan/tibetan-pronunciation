@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 import { useTrainingSession } from '../../hooks/useTrainingSession'
 import Flashcard from './Flashcard'
-import RatingControls from './RatingControls'
 import TrainingBanner from './TrainingBanner'
 import './TrainingView.css'
 
@@ -79,16 +78,13 @@ function TrainingView({ deck }) {
                 />
             </div>
 
-            <Flashcard card={currentCard} showAnswer={showAnswer} />
-
-            {currentCard && (
-                <RatingControls
-                    showAnswer={showAnswer}
-                    predictedNextDueDates={predictedNextDueDates}
-                    onReveal={actions.reveal}
-                    onRate={actions.rate}
-                />
-            )}
+            <Flashcard
+                card={currentCard}
+                showAnswer={showAnswer}
+                predictedNextDueDates={predictedNextDueDates}
+                onRate={actions.rate}
+                onReveal={actions.reveal}
+            />
         </main>
     )
 }
