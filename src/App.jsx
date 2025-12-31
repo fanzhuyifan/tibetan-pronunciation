@@ -17,7 +17,6 @@ function App() {
   return (
     <div className="page">
       <div className="topnav">
-        <div className="brand">Tibetan trainer</div>
         <div className="nav-actions">
           <button
             className={view === VIEW_TRAINING ? 'active' : ''}

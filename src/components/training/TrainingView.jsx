@@ -1,7 +1,5 @@
 import { useRef } from 'react'
 import { useTrainingSession } from '../../hooks/useTrainingSession'
-import ExportIcon from './icons/ExportIcon'
-import ImportIcon from './icons/ImportIcon'
 import Flashcard from './Flashcard'
 import RatingControls from './RatingControls'
 import TrainingBanner from './TrainingBanner'
@@ -63,39 +61,21 @@ function TrainingView({ deck }) {
     return (
         <main className="syllable-panel">
             <div className="training-header">
-                <div className="io-buttons" aria-label="Import or export deck">
-                    <button
-                        className="secondary icon-button"
-                        onClick={handleImportClick}
-                        type="button"
-                        aria-label="Import YAML"
-                        title="Import YAML"
-                    >
-                        <ImportIcon />
-                    </button>
-                    <button
-                        className="secondary icon-button"
-                        onClick={handleExport}
-                        type="button"
-                        aria-label="Export YAML"
-                        title="Export YAML"
-                    >
-                        <ExportIcon />
-                    </button>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".yaml,.yml,text/yaml,text/x-yaml"
-                        onChange={handleImportFile}
-                        style={{ display: 'none' }}
-                    />
-                </div>
-
                 <TrainingBanner
                     newCardsToLearn={newCardsToLearn}
                     reviewsDue={trainingStats?.reviewsDue ?? 0}
                     learningCardsDue={trainingStats?.learningCardsDue ?? 0}
                     onChangeNewCards={updateNewCardsToLearn}
+                    onImportClick={handleImportClick}
+                    onExportClick={handleExport}
+                />
+
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".yaml,.yml,text/yaml,text/x-yaml"
+                    onChange={handleImportFile}
+                    style={{ display: 'none' }}
                 />
             </div>
 

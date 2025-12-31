@@ -41,6 +41,11 @@
     font-size: 0.98rem;
 }
 
+.answer-line.answer-center {
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+}
 .answer-line.components {
     align-items: center;
     flex-wrap: wrap;

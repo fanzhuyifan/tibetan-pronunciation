@@ -26,13 +26,11 @@ function Flashcard({ card, showAnswer }) {
 
             {showAnswer && card && (
                 <div className="answer-block">
-                    <div className="answer-line">
-                        <span className="answer-label">Pronunciation</span>
-                        <span className="answer-value">{card.pronunciation}</span>
-                    </div>
-                    <div className="answer-line">
-                        <span className="answer-label">Wylie</span>
-                        <span className="answer-value">{card.wylie}</span>
+                    <div className="answer-line answer-center">
+                        <span className="answer-value">
+                            {card.pronunciation}
+                            {card.wylie ? ` (Wylie: ${card.wylie})` : ''}
+                        </span>
                     </div>
                     <div className="answer-line components">
                         <span className="answer-label">Components</span>
