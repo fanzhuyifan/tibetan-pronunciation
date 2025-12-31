@@ -1,4 +1,4 @@
-function ImportIcon(props) {
+function ExportIcon(props) {
     return (
         <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false" {...props}>
             <path
@@ -13,4 +13,4 @@ function ImportIcon(props) {
     )
 }
 
-export default ImportIcon
+export default ExportIcon
