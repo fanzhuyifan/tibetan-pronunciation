@@ -232,7 +232,7 @@ export function useFsrsDeck(consonants = defaultConsonants, vowels = defaultVowe
         if (!nextCard) return null
         const { kind } = nextCard
 
-        const partner = (targetKind) => getNextCard({ predicate: (meta) => (!predicate || predicate(meta)) && meta.kind === targetKind })
+        const partner = (targetKind) => getNextCard({ predicate: (meta) => meta.kind === targetKind })
 
         switch (kind) {
             case KIND_CONSONANT:
