@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { consonants, vowels, suffixes } from '../../data/tibetanData'
 
 const dataByKind = {
@@ -69,10 +69,6 @@ const ComponentTile = ({ kind, title, letter, onSelect, isActive }) => (
 
 function ComponentDetail({ card }) {
     const [activeKind, setActiveKind] = useState(null)
-
-    useEffect(() => {
-        setActiveKind(null)
-    }, [card?.letter])
 
     const detail = useMemo(() => {
         if (!card || !activeKind) return null
