@@ -48,19 +48,21 @@ export const useStats = (cards) => {
             }
         }
 
-        let due = new Date(card.due)
-        if (due < now) due = now
+        if (card.state != State.New) {
+            let due = new Date(card.due)
+            if (due < now) due = now
 
-        const d = new Date(due)
-        d.setHours(0, 0, 0, 0)
-        const key = d.getTime()
+            const d = new Date(due)
+            d.setHours(0, 0, 0, 0)
+            const key = d.getTime()
 
-        const dayCounts = counts.get(key) || { total: 0, consonant: 0, vowel: 0, suffix: 0 }
-        dayCounts.total++
-        if (dayCounts[kind] !== undefined) {
-            dayCounts[kind]++
+            const dayCounts = counts.get(key) || { total: 0, consonant: 0, vowel: 0, suffix: 0 }
+            dayCounts.total++
+            if (dayCounts[kind] !== undefined) {
+                dayCounts[kind]++
+            }
+            counts.set(key, dayCounts)
         }
-        counts.set(key, dayCounts)
     })
 
     const forecastData = []

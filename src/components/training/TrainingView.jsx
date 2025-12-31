@@ -73,7 +73,7 @@ function TrainingView({ deck }) {
                 <TrainingBanner
                     reviewsDue={trainingStats?.reviewsDue ?? 0}
                     learningCardsDue={trainingStats?.learningCardsDue ?? 0}
-                    newCardsToLearn={newCardsToLearn}
+                    newCardsToLearn={Math.min(newCardsToLearn, newCardsAvailable)}
                     onImportClick={handleImportClick}
                     onExportClick={handleExport}
                 />
@@ -106,7 +106,6 @@ function TrainingView({ deck }) {
                 </>
             ) : (
                 <MoreTraining
-                    newCardsToLearn={newCardsToLearn}
                     newCardsAvailable={newCardsAvailable}
                     onChangeReviewAheadDays={updateReviewAheadDays}
                     onChangeNewCards={updateNewCardsToLearn}
