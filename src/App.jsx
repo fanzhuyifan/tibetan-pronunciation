@@ -5,10 +5,12 @@ import { useFsrsDeck } from './hooks/useFsrsDeck'
 import TrainingView from './components/training/TrainingView'
 import StatsView from './StatsView'
 import BrowseView from './BrowseView'
+import HelpView from './HelpView'
 
 const VIEW_TRAINING = 'training'
 const VIEW_STATS = 'stats'
 const VIEW_BROWSE = 'browse'
+const VIEW_HELP = 'help'
 
 function App() {
   const [view, setView] = useState(VIEW_TRAINING)
@@ -36,6 +38,12 @@ function App() {
           >
             Browse
           </button>
+          <button
+            className={view === VIEW_HELP ? 'active' : ''}
+            onClick={() => setView(VIEW_HELP)}
+          >
+            Help
+          </button>
         </div>
       </div>
 
@@ -48,6 +56,8 @@ function App() {
               return <StatsView cards={deck.stateCards} />
             case VIEW_BROWSE:
               return <BrowseView cards={deck.stateCards} />
+            case VIEW_HELP:
+              return <HelpView />
             default:
               return null
           }
