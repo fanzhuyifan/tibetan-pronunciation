@@ -32,17 +32,16 @@ function MoreTraining({ newCardsAvailable = 0, onChangeReviewAheadDays, onChange
                 </select>
             </label>
 
-            <label className="ahead-control">
-                <span>More new cards:</span>
-                <select value={0} onChange={handleNewCardsChange}>
-                    {newCardOptions.map((option) => (
-                        <option key={option} value={option}>{`• ${option}`}</option>
-                    ))}
-                    {newCardsAvailable > maxSelectable ? (
-                        <option value={newCardsAvailable}>{`• All available (${newCardsAvailable})`}</option>
-                    ) : null}
-                </select>
-            </label>
+            {newCardsAvailable > 0 ? (
+                <label className="ahead-control">
+                    <span>More new cards:</span>
+                    <select value={0} onChange={handleNewCardsChange}>
+                        {newCardOptions.map((option) => (
+                            <option key={option} value={option}>{`• ${option}`}</option>
+                        ))}
+                    </select>
+                </label>
+            ) : null}
         </div>
     )
 }
