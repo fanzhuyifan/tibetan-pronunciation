@@ -109,38 +109,38 @@ describe('TibetanSyllableFactory', () => {
     it('suffix without vowel roundtrip', () => {
         assertRoundtrip({
             base: 'ཀ',
-            suffixLetter: 'ང',
-            expectedWylie: 'kang',
-            expectedPron: 'ge\u0305ng',
+            suffixLetter: 'ན',
+            expectedWylie: 'kan',
+            expectedPron: 'ge\u0305n',
         })
         assertRoundtrip({
             base: 'ཁ',
-            suffixLetter: 'ང',
-            expectedWylie: 'khang',
-            expectedPron: 'ke\u0305ng',
+            suffixLetter: 'ན',
+            expectedWylie: 'khan',
+            expectedPron: 'ke\u0305n',
         })
         assertRoundtrip({
             base: 'ག',
-            suffixLetter: 'ང',
-            expectedWylie: 'gang',
-            expectedPron: 'ke\u0301ng',
+            suffixLetter: 'ན',
+            expectedWylie: 'gan',
+            expectedPron: 'ke\u0301n',
         })
     })
 
     it('suffix with vowel roundtrip', () => {
         const cases = [
-            ['ེ', 'e', 'ge\u0305ng'],
-            ['ི', 'i', 'gi\u0305ng'],
-            ['ོ', 'o', 'gö\u0305ng'],
-            ['ུ', 'u', 'gü\u0305ng'],
+            ['ེ', 'e', 'ge\u0305n'],
+            ['ི', 'i', 'gi\u0305n'],
+            ['ོ', 'o', 'gö\u0305n'],
+            ['ུ', 'u', 'gü\u0305n'],
         ]
 
         for (const [vowelLetter, vowelWylie, expectedPron] of cases) {
             assertRoundtrip({
                 base: 'ཀ',
                 vowelLetter,
-                suffixLetter: 'ང',
-                expectedWylie: `k${vowelWylie}ng`,
+                suffixLetter: 'ན',
+                expectedWylie: `k${vowelWylie}n`,
                 expectedPron,
             })
         }

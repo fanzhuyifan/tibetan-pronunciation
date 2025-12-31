@@ -17,10 +17,6 @@
     '◌̀': '◌̅'
     '◌́': '◌́'
   comment: "longer and weaker"
-  vowel_change:
-    'a': 'e'
-    'u': "ü"
-    'o': "ö"
 - letter: 'མ'
   suffix: 'm'
   tone_change:
