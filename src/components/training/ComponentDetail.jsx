@@ -85,8 +85,6 @@ function ComponentDetail({ card }) {
 
     if (!card) return null
 
-    const hasVowel = Boolean(card.vowel)
-    const hasSuffix = Boolean(card.suffix)
 
     const handleSelect = (kind, letter) => {
         if (!letter) return
@@ -97,20 +95,25 @@ function ComponentDetail({ card }) {
         setActiveKind(null)
     }
 
+    const vowelComponent = card.vowel && (
+        <ComponentTile
+            kind="vowel"
+            title="Vowel"
+            letter={card.vowel}
+            onSelect={(kind) => handleSelect(kind, card.vowel)}
+            isActive={activeKind === 'vowel'}
+        />
+    )
+
+    console.log(card.vowel)
+    const vowelAbove = ['ི', 'ོ', 'ེ'].includes(card.vowel)
+
     return (
         <>
             {!detail && (
                 <div className="components-diagram" aria-label="Syllable components">
                     <div className="component-column">
-                        {hasVowel && (
-                            <ComponentTile
-                                kind="vowel"
-                                title="Vowel"
-                                letter={card.vowel}
-                                onSelect={(kind) => handleSelect(kind, card.vowel)}
-                                isActive={activeKind === 'vowel'}
-                            />
-                        )}
+                        {vowelAbove && vowelComponent}
                         <ComponentTile
                             kind="consonant"
                             title="Base"
@@ -118,8 +121,9 @@ function ComponentDetail({ card }) {
                             onSelect={(kind) => handleSelect(kind, card.consonant)}
                             isActive={activeKind === 'consonant'}
                         />
+                        {!vowelAbove && vowelComponent}
                     </div>
-                    {hasSuffix && (
+                    {card.suffix && (
                         <ComponentTile
                             kind="suffix"
                             title="Suffix"
