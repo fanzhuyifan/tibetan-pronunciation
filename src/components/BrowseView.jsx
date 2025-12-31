@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { State } from 'ts-fsrs'
-import { consonants, vowels, suffixes } from './data/tibetanData'
-import { formatTime } from './utils'
+import { consonants, vowels, suffixes } from '../data/tibetanData'
+import { formatTime } from '../utils'
 import './BrowseView.css'
 
 const kindLabels = {
