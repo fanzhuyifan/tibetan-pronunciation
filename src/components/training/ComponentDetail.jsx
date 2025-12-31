@@ -45,11 +45,11 @@ const buildDetail = (kind, letter) => {
                 title: 'Suffix',
                 rows: [
                     { label: 'Letter', value: letter || '—' },
-                    { label: 'Romanization', value: meta?.suffix || meta?.wylie || '—' },
+                    { label: 'Suffix', value: meta?.suffix || meta?.wylie || '—' },
                     { label: 'Tone change', value: formatMapping(meta?.tone_change) || '—' },
-                    { label: 'Vowel change', value: formatMapping(meta?.vowel_change) || '—' },
+                    meta?.vowel_change ? { label: 'Vowel change', value: formatMapping(meta?.vowel_change) } : null,
                     { label: 'Note', value: meta?.comment || '—' },
-                ],
+                ].filter(Boolean),
             }
         default:
             return null
