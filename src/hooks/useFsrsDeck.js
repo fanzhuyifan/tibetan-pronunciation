@@ -241,6 +241,9 @@ export function useFsrsDeck(consonants = defaultConsonants, vowels = defaultVowe
                 }
             })
             if (candidates.length === 0) return null
+            if (targetKind === KIND_VOWEL) {
+                candidates.push(null) // allow no vowel (a)
+            }
             return candidates[Math.floor(Math.random() * candidates.length)]
         }
 
