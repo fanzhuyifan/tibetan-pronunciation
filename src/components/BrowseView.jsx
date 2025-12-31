@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { State } from 'ts-fsrs'
 import { consonants, vowels, suffixes } from '../data/tibetanData'
 import { formatTime } from '../utils'
 import './BrowseView.css'
+import ComponentDetailView from './training/ComponentDetailView'
 
 const kindLabels = {
     consonant: 'Consonant',
@@ -39,6 +40,7 @@ const lookupMeta = (kind, letter) => {
 }
 
 function BrowseView({ cards }) {
+    const [selectedId, setSelectedId] = useState(null)
     const rows = useMemo(() => {
         const now = new Date()
         return Array.from(cards?.entries?.() || [])
@@ -64,6 +66,10 @@ function BrowseView({ cards }) {
             })
     }, [cards])
 
+    const handleRowSelect = useCallback((id) => {
+        setSelectedId((prev) => (prev === id ? null : id))
+    }, [])
+
     return (
         <div className="browse-panel">
             <div className="browse-toolbar">
@@ -83,7 +89,14 @@ function BrowseView({ cards }) {
                 </div>
 
                 {rows.map((row) => (
-                    <div className="browse-row" key={row.id}>
+                    <div key={row.id}>
+                        <div
+                            className={`browse-row ${selectedId === row.id ? 'is-selected' : ''}`}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => handleRowSelect(row.id)}
+                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleRowSelect(row.id)}
+                        >
                         <div className="browse-card">
                             <div className="letter-symbol">{row.letter || '?'}</div>
                             <div className="letter-meta">
@@ -129,6 +142,13 @@ function BrowseView({ cards }) {
                                 </div>
                             </div>
                         </div>
+                        </div>
+
+                        {selectedId === row.id && (
+                            <div className="browse-row-detail" onClick={() => setSelectedId(null)}>
+                                <ComponentDetailView kind={row.kind} letter={row.letter} />
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

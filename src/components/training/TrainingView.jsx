@@ -89,7 +89,11 @@ function TrainingView({ deck }) {
 
             {currentCard ? (
                 <>
-                    <FlashcardPrompt card={currentCard} />
+                    <FlashcardPrompt
+                        card={currentCard}
+                        onToggleReveal={actions.toggleReveal}
+                        showAnswer={showAnswer}
+                    />
                     {showAnswer ? (
                         <FlashcardAnswer
                             card={currentCard}
@@ -98,7 +102,7 @@ function TrainingView({ deck }) {
                         />
                     ) : (
                         <div className="answer-reveal">
-                            <button className="primary" onClick={actions.reveal} title="Show answer (Space or Enter)">
+                                <button className="primary" onClick={actions.toggleReveal} title="Show answer (Space or Enter)">
                                 Show answer
                             </button>
                         </div>

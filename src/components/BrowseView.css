@@ -73,6 +73,10 @@
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
 }
 
+.browse-row.is-selected {
+    border-color: #818cf8;
+    box-shadow: 0 12px 28px rgba(51, 65, 85, 0.12);
+}
 .browse-card {
     display: flex;
     align-items: center;

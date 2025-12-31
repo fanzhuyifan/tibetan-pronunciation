@@ -85,8 +85,8 @@ export function useTrainingSession(deck) {
 
     const currentCard = buildCurrentSyllable(factory, syllable)
 
-    const handleReveal = useCallback(() => {
-        setShowAnswer(true)
+    const handleToggleReveal = useCallback(() => {
+        setShowAnswer((s) => !s)
     }, [])
 
     const handleFsrsRating = useCallback(
@@ -121,7 +121,7 @@ export function useTrainingSession(deck) {
 
             if (!showAnswer && (key === ' ' || key === 'Enter')) {
                 event.preventDefault()
-                handleReveal()
+                handleToggleReveal()
                 return
             }
 
@@ -142,7 +142,7 @@ export function useTrainingSession(deck) {
 
         window.addEventListener('keydown', handler)
         return () => window.removeEventListener('keydown', handler)
-    }, [showAnswer, handleReveal, handleFsrsRating])
+    }, [showAnswer, handleToggleReveal, handleFsrsRating])
 
     const trainingStats = useMemo(() => {
         const values = cards instanceof Map ? Array.from(cards.values()) : []
@@ -184,7 +184,7 @@ export function useTrainingSession(deck) {
         predictedNextDueDates,
         newCardsToLearn,
         actions: {
-            reveal: handleReveal,
+            toggleReveal: handleToggleReveal,
             rate: handleFsrsRating,
         },
     }

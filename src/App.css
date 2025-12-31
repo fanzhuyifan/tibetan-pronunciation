@@ -46,7 +46,13 @@
   box-shadow: 0 10px 24px rgba(248, 250, 252, 0.35);
 }
 
-button {
+button,
+.component-tile,
+.io-button,
+.browse-row,
+.browse-row-detail,
+.component-detail,
+.syllable-display {
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   padding: 0.7rem 1.35rem;
@@ -59,7 +65,13 @@ button {
   color: var(--color-text);
 }
 
-button:hover {
+button:hover,
+.component-tile:hover,
+.io-button:hover,
+.browse-row:hover,
+.browse-row-detail:hover,
+.component-detail:hover,
+.syllable-display:hover {
   transform: translateY(-1px);
 }
 

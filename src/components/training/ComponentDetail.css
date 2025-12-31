@@ -45,8 +45,6 @@
     background: linear-gradient(160deg, #fff 0%, #f8fafc 60%, #eef2ff 100%);
     padding: 0.5rem 0.75rem;
     text-align: center;
-    cursor: pointer;
-    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
 }
 
 .component-tile.vowel {
@@ -61,11 +59,9 @@
     background: linear-gradient(160deg, #f3e8ff 0%, #f5f3ff 60%, #ede9fe 100%);
 }
 
-.component-tile:hover,
 .component-tile.is-active {
     border-color: #818cf8;
     box-shadow: 0 10px 30px rgba(51, 65, 85, 0.12);
-    transform: translateY(-2px);
 }
 
 .component-title {

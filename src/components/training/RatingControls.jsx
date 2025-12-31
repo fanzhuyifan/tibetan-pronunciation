@@ -9,12 +9,12 @@ const ratingButtons = [
     { label: 'Easy', rating: Rating.Easy, hotkey: '4' },
 ]
 
-function RatingControls({ showAnswer, predictedNextDueDates, onReveal, onRate }) {
+function RatingControls({ showAnswer, predictedNextDueDates, onToggleReveal, onRate }) {
 
     if (!showAnswer) {
         return (
             <footer className="actions">
-                <button className="primary" onClick={onReveal} title="Show answer (Space or Enter)">
+                <button className="primary" onClick={onToggleReveal} title="Show answer (Space or Enter)">
                     Show answer
                 </button>
             </footer>
