@@ -182,6 +182,7 @@ export function useTrainingSession(deck) {
         updateReviewAheadDays,
         trainingStats,
         predictedNextDueDates,
+        newCardsToLearn,
         actions: {
             reveal: handleReveal,
             rate: handleFsrsRating,
