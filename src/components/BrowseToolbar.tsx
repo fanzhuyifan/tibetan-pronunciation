@@ -13,7 +13,6 @@ export const BrowseToolbar = ({ kindFilter, setKindFilter, kindCounts, totalCoun
         <div className="panel-header">
             <div>
                 <div className="panel-title">Browse cards</div>
-                <p className="panel-subtitle">Inspect every consonant, vowel, and suffix.</p>
             </div>
             <div className="browse-actions">
                 <div className="browse-filters" role="group" aria-label="Filter by card kind">

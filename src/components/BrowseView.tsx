@@ -28,13 +28,6 @@ function BrowseView({ cards }: BrowseViewProps) {
             />
 
             <div className="browse-table">
-                <div className="browse-head">
-                    <div>Card</div>
-                    <div>Status</div>
-                    <div>Due</div>
-                    <div>Metrics</div>
-                </div>
-
                 {filteredRows.map((row) => (
                     <BrowseRow
                         key={row.id}

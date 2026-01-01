@@ -6,19 +6,26 @@ import { Rating } from 'ts-fsrs'
 
 interface FlashcardAnswerProps {
     card: TibetanSyllable | null;
+    isReverse: boolean;
     predictedNextDueDates: Record<number, Date | null> | null;
     onRate: (rating: Rating) => void;
 }
 
-function FlashcardAnswer({ card, predictedNextDueDates, onRate }: FlashcardAnswerProps) {
+function FlashcardAnswer({ card, isReverse, predictedNextDueDates, onRate }: FlashcardAnswerProps) {
     if (!card) return null
 
     return (
         <div className="answer-block">
             <div className="answer-line answer-center">
                 <span className="answer-value">
-                    {card.pronunciation}
-                    {card.wylie ? ` (Wylie: ${card.wylie})` : ''}
+                    {isReverse ? (
+                        <span style={{ fontSize: '3rem' }}>{card.letter}</span>
+                    ) : (
+                        <>
+                                {card.pronunciation}
+                                {card.wylie ? ` (Wylie: ${card.wylie})` : ''}
+                        </>
+                    )}
                 </span>
             </div>
             <div className="answer-ratings">

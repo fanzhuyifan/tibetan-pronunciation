@@ -10,7 +10,7 @@ function ComponentDetailContent({ detail }: ComponentDetailContentProps) {
 
     return (
         <>
-            <div className={styles.componentDetailTitle}>{detail.title} details</div>
+            <div className={styles.componentDetailTitle}>{detail.title}</div>
             <dl className={styles.componentDetailGrid}>
                 {detail.rows.map((row) => (
                     <div key={`${detail.title}-${row.label}`} className={styles.componentDetailRow}>

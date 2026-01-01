@@ -18,8 +18,61 @@ interface BrowseRowProps {
     onSelect: (id: string) => void;
 }
 
+const BrowseRowSummary = ({ row, wylie, pronunciation }: { row: BrowseRowData, wylie?: string, pronunciation?: string }) => {
+    const { kind, letter, card, reverseCard, due, intervalSeconds, reverseIntervalSeconds } = row
+    return (
+        <>
+            <div className="browse-card">
+                <div className="letter-symbol">{letter || '?'}</div>
+                <div className="letter-meta">
+                    <div className="letter-kind">{KIND_LABELS[kind || ''] || 'Unknown'}</div>
+                    {wylie && <div className="letter-wylie">{wylie}</div>}
+                    {pronunciation && (
+                        <div className="letter-pron">/{pronunciation}/</div>
+                    )}
+                </div>
+            </div>
+
+            <div className="browse-stats-grid">
+                <div className="stat-col">
+                    <div className="stat-header">Forward</div>
+                    <span className={`state-pill ${stateClassNames[card?.state] || ''}`}>
+                        {STATE_LABELS[card?.state] || 'New'}
+                    </span>
+                    <div className="due-sub">
+                        {due
+                            ? intervalSeconds <= 0
+                                ? 'Overdue'
+                                : formatTime(intervalSeconds)
+                            : '—'}
+                    </div>
+                </div>
+                <div className="stat-col">
+                    <div className="stat-header">Reverse</div>
+                    {reverseCard ? (
+                        <>
+                            <span className={`state-pill ${stateClassNames[reverseCard.state] || ''}`}>
+                                {STATE_LABELS[reverseCard.state] || 'New'}
+                            </span>
+                            <div className="due-sub">
+                                {reverseCard.due
+                                    ? (reverseIntervalSeconds ?? 0) <= 0
+                                        ? 'Overdue'
+                                        : formatTime(reverseIntervalSeconds ?? 0)
+                                    : '—'}
+                            </div>
+                        </>
+                    ) : (
+                        <span className="state-pill">N/A</span>
+                    )}
+                </div>
+            </div>
+        </>
+    )
+}
+
 const BrowseRow = memo(({ row, isSelected, onSelect }: BrowseRowProps) => {
-    const { id, kind, letter, card, due, intervalSeconds, meta } = row
+    const { id, kind, letter, meta } = row
 
     const { wylie, pronunciation } = useMemo(() => {
         const m = meta as TibetanData | null
@@ -31,61 +84,19 @@ const BrowseRow = memo(({ row, isSelected, onSelect }: BrowseRowProps) => {
     }, [meta])
 
     return (
-        <div>
-            <div
-                className={`browse-row ${isSelected ? 'is-selected' : ''}`}
-                role="button"
-                tabIndex={0}
-                onClick={() => onSelect(id)}
-                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect(id)}
-            >
-                <div className="browse-card">
-                    <div className="letter-symbol">{letter || '?'}</div>
-                    <div className="letter-meta">
-                        <div className="letter-kind">{KIND_LABELS[kind || ''] || 'Unknown'}</div>
-                        {wylie && <div className="letter-wylie">Wylie: {wylie}</div>}
-                        {pronunciation && (
-                            <div className="letter-pron">Pron.: {pronunciation}</div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="browse-state">
-                    <span className={`state-pill ${stateClassNames[card?.state] || ''}`}>
-                        {STATE_LABELS[card?.state] || 'Unknown'}
-                    </span>
-                    <div className="state-subtext">
-                        Reps {card?.reps ?? 0} | Lapses {card?.lapses ?? 0}
-                    </div>
-                </div>
-
-                <div className="browse-due">
-                    <div className="due-main">{due ? due.toLocaleString() : 'Not scheduled'}</div>
-                    <div className="due-sub">
-                        {due
-                            ? intervalSeconds <= 0
-                                ? 'Overdue'
-                                : `in ${formatTime(intervalSeconds)}`
-                            : '—'}
-                    </div>
-                </div>
-
-                <div className="browse-metrics">
-                    <div>S: {card?.stability?.toFixed(2) ?? '0.00'}</div>
-                    <div>D: {card?.difficulty?.toFixed(2) ?? '0.00'}</div>
-                </div>
-            </div>
-
-            {isSelected && (
-                <div
-                    className="browse-detail"
-                    onClick={() => onSelect(id)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect(id)}
-                >
+        <div
+            className={`browse-row ${isSelected ? 'is-selected' : ''}`}
+            role="button"
+            tabIndex={0}
+            onClick={() => onSelect(id)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect(id)}
+        >
+            {isSelected ? (
+                <div className="browse-detail-container">
                     <ComponentDetailView kind={kind || ''} letter={letter} />
                 </div>
+            ) : (
+                <BrowseRowSummary row={row} wylie={wylie} pronunciation={pronunciation} />
             )}
         </div>
     )

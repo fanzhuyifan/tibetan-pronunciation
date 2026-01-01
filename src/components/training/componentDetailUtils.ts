@@ -31,7 +31,7 @@ export const buildDetail = (kind: string, letter: string | null): DetailData | n
         case 'consonant':
             const c = meta as Consonant | undefined;
             return {
-                title: 'Base consonant',
+                title: 'Base',
                 rows: [
                     { label: 'Letter', value: letter || '—' },
                     { label: 'Wylie', value: c?.wylie || '—' },
@@ -56,8 +56,8 @@ export const buildDetail = (kind: string, letter: string | null): DetailData | n
                 rows: [
                     { label: 'Letter', value: letter || '—' },
                     { label: 'Suffix', value: s?.suffix || '—' },
-                    { label: 'Tone change', value: formatMapping(s?.tone_change) || '—' },
-                    s?.vowel_change ? { label: 'Vowel change', value: formatMapping(s?.vowel_change) } : null,
+                    { label: 'Tone', value: formatMapping(s?.tone_change) || '—' },
+                    s?.vowel_change ? { label: 'Vowel', value: formatMapping(s?.vowel_change) } : null,
                     { label: 'Note', value: s?.comment || '—' },
                 ].filter((row): row is DetailRow => Boolean(row)),
             }

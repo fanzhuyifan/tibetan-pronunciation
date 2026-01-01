@@ -99,6 +99,7 @@ export function useTrainingSession(deck: DeckInterface) {
     }, [newCardsToLearn, getNextSyllable, dueDatePredicate])
 
     const currentCard = buildCurrentSyllable(factory, syllable)
+    const isReverse = syllable?.primary?.reversed || false
 
     const handleToggleReveal = useCallback(() => {
         setShowAnswer((s) => !s)
@@ -194,6 +195,7 @@ export function useTrainingSession(deck: DeckInterface) {
 
     return {
         currentCard,
+        isReverse,
         showAnswer,
         updateNewCardsToLearn,
         updateReviewAheadDays,

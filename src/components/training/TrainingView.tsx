@@ -16,6 +16,7 @@ interface TrainingViewProps {
 function TrainingView({ deck }: TrainingViewProps) {
     const {
         currentCard,
+        isReverse,
         showAnswer,
         predictedNextDueDates,
         trainingStats,
@@ -56,12 +57,14 @@ function TrainingView({ deck }: TrainingViewProps) {
                 <>
                     <FlashcardPrompt
                         card={currentCard}
+                        isReverse={isReverse}
                         onToggleReveal={actions.toggleReveal}
                         showAnswer={showAnswer}
                     />
                     {showAnswer ? (
                         <FlashcardAnswer
                             card={currentCard}
+                            isReverse={isReverse}
                             predictedNextDueDates={predictedNextDueDates}
                             onRate={actions.rate}
                         />

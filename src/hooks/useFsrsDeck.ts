@@ -55,6 +55,9 @@ const ensureDeck = (consonants: Consonant[], vowels: Vowel[], suffixes: Suffix[]
             if (!letter) return
             const id = createCardId(kind, letter)
             cards.set(id, existingCards.get(id) || createEmptyCard())
+
+            const revId = createCardId(kind, letter, true)
+            cards.set(revId, existingCards.get(revId) || createEmptyCard())
         })
     }
 
@@ -99,6 +102,7 @@ export interface DeckCandidate {
     card: Card;
     kind: string | null;
     letter: string | null;
+    reversed: boolean;
     dueTime?: number;
 }
 
@@ -123,8 +127,8 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
         let best: DeckCandidate | null = null
 
         stateCards.forEach((card, id) => {
-            const { kind, letter } = parseCardId(id)
-            const candidate: DeckCandidate = { id, card, kind, letter }
+            const { kind, letter, reversed } = parseCardId(id)
+            const candidate: DeckCandidate = { id, card, kind, letter, reversed }
 
             if (predicate && !predicate(candidate)) return
 
@@ -210,14 +214,14 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
     function getNextSyllable(predicate: ((c: DeckCandidate) => boolean) | null = null) {
         const nextCard = getNextCard({ predicate })
         if (!nextCard) return null
-        const { kind } = nextCard
+        const { kind, reversed } = nextCard
 
         const partner = (targetKind: string): DeckCandidate | null => {
             const candidates: DeckCandidate[] = []
             stateCards.forEach((card, id) => {
-                const { kind: k, letter } = parseCardId(id)
-                if (k === targetKind) {
-                    candidates.push({ id, card, kind: k, letter })
+                const { kind: k, letter, reversed: r } = parseCardId(id)
+                if (k === targetKind && r === reversed) {
+                    candidates.push({ id, card, kind: k, letter, reversed: r })
                 }
             })
             if (candidates.length === 0) return null

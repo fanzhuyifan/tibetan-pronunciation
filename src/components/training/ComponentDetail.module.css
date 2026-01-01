@@ -91,4 +91,7 @@
 .componentDetailRow dd {
     margin: 0;
     color: #0f172a;
+    white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 }

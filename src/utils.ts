@@ -20,12 +20,12 @@ export const formatTime = (seconds: number): string => {
     return `${Math.round(years)}y`
 }
 
-export const createCardId = (kind: string, letter: string): string => `${kind}:${letter}`
+export const createCardId = (kind: string, letter: string, reversed = false): string => `${kind}:${letter}${reversed ? ':rev' : ''}`
 
-export const parseCardId = (id: string | null | undefined): { kind: string | null, letter: string | null } => {
-    if (!id) return { kind: null, letter: null }
-    const [kind, letter] = id.split(':')
-    return { kind, letter }
+export const parseCardId = (id: string | null | undefined): { kind: string | null, letter: string | null, reversed: boolean } => {
+    if (!id) return { kind: null, letter: null, reversed: false }
+    const [kind, letter, revTag] = id.split(':')
+    return { kind, letter, reversed: revTag === 'rev' }
 }
 
 export type TibetanData = Consonant | Vowel | Suffix;

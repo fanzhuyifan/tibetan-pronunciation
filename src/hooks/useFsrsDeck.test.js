@@ -40,9 +40,9 @@ describe('useFsrsDeck', () => {
         vi.useRealTimers()
     })
 
-    it('initializes a card for each letter kind', () => {
+    it('initializes a card for each letter kind (forward and reverse)', () => {
         const { result } = renderHook(() => useFsrsDeck(consonants, vowels, suffixes))
-        expect(result.current.stateCards.size).toBe(3)
+        expect(result.current.stateCards.size).toBe(6)
     })
 
     it('returns the next syllable with prioritized consonant', () => {
