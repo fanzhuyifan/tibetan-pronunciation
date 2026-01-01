@@ -1,16 +1,31 @@
-# React + Vite
+## Tibetan Practice Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive Tibetan syllable trainer built with React + Vite. The app helps practice consonants, vowels, and suffixes using FSRS-based spaced repetition, browsing, and inline reference details.
 
-Currently, two official plugins are available:
+### Features
+- Training view with reveal/rate flow and YAML import/export of progress.
+- Browse view with filters and per-card details (consonant, vowel, suffix metadata).
+- Stats dashboard (reviews due, stability/difficulty forecasts).
+- Shared pronunciation utilities and syllable builder for consistent rendering.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Getting started
+```bash
+npm install
+npm run dev    # start Vite dev server
+npm run build  # production build
+npm run lint   # eslint
+npm test       # vitest tests
+```
 
-## React Compiler
+### Key modules
+- `src/tibetanSyllable.js` / `src/utils/pronunciation.js`: build Tibetan syllables, apply tones, vowel/suffix adjustments.
+- `src/hooks/useFsrsDeck.js`: deck state and FSRS scheduling.
+- `src/components/training/*`: training flow, flashcards, component details.
+- `src/components/BrowseView.jsx`: browse/filter cards with per-card detail view.
+- `src/components/stats/*`: stats and forecasts.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Data
+- Tibetan consonant, vowel, and suffix metadata live in `src/data/` (YAML + bundled JS).
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Testing
+- Unit tests for syllable logic and FSRS hook live in `src/tibetanSyllable.test.js` and `src/hooks/useFsrsDeck.test.js`.

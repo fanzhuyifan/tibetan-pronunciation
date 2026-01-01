@@ -47,11 +47,9 @@
 }
 
 button,
-.component-tile,
 .io-button,
 .browse-row,
 .browse-row-detail,
-.component-detail,
 .syllable-display {
   border-radius: var(--radius-md);
   border: 1px solid transparent;
@@ -66,11 +64,9 @@ button,
 }
 
 button:hover,
-.component-tile:hover,
 .io-button:hover,
 .browse-row:hover,
 .browse-row-detail:hover,
-.component-detail:hover,
 .syllable-display:hover {
   transform: translateY(-1px);
 }

@@ -1,15 +1,22 @@
 import { useMemo, useState } from 'react'
 import { buildDetail } from './componentDetailUtils'
-import './ComponentDetail.css'
+import ComponentDetailContent from './ComponentDetailContent'
+import styles from './ComponentDetail.module.css'
 const ComponentTile = ({ kind, title, letter, onSelect, isActive }) => (
     <button
         type="button"
-        className={`component-tile ${kind}${isActive ? ' is-active' : ''}`}
+        className={[
+            styles.componentTile,
+            kind === 'vowel' && styles.componentTileVowel,
+            kind === 'consonant' && styles.componentTileConsonant,
+            kind === 'suffix' && styles.componentTileSuffix,
+            isActive && styles.componentTileActive,
+        ].filter(Boolean).join(' ')}
         onClick={() => onSelect(kind)}
         aria-pressed={isActive}
     >
-        <span className="component-title">{title}</span>
-        <span className="component-letter-large">{letter || '—'}</span>
+        <span className={styles.componentTitle}>{title}</span>
+        <span className={styles.componentLetterLarge}>{letter || '—'}</span>
     </button>
 )
 
@@ -50,14 +57,13 @@ function ComponentDetail({ card }) {
         />
     )
 
-    console.log(card.vowel)
     const vowelAbove = ['ི', 'ོ', 'ེ'].includes(card.vowel)
 
     return (
         <>
             {!detail && (
-                <div className="components-diagram" aria-label="Syllable components">
-                    <div className="component-column">
+                <div className={styles.componentsDiagram} aria-label="Syllable components">
+                    <div className={styles.componentColumn}>
                         {vowelAbove && vowelComponent}
                         <ComponentTile
                             kind="consonant"
@@ -81,21 +87,13 @@ function ComponentDetail({ card }) {
             )}
             {detail && (
                 <div
-                    className="component-detail"
+                    className={styles.componentDetail}
                     aria-live="polite"
                     role="button"
                     tabIndex={0}
                     onClick={handleDetailExit}
                 >
-                    <div className="component-detail-title">{detail.title} details</div>
-                    <dl className="component-detail-grid">
-                        {detail.rows.map((row) => (
-                            <div key={`${detail.title}-${row.label}`} className="component-detail-row">
-                                <dt>{row.label}</dt>
-                                <dd>{row.value}</dd>
-                            </div>
-                        ))}
-                    </dl>
+                    <ComponentDetailContent detail={detail} />
                 </div>
             )}
         </>

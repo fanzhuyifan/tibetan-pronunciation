@@ -1,0 +1,99 @@
+.componentsDiagram {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.componentColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.componentTile {
+    min-width: 110px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: linear-gradient(160deg, #fff 0%, #f8fafc 60%, #eef2ff 100%);
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+    transition: transform 120ms ease, box-shadow 180ms ease, border-color 120ms ease;
+}
+
+.componentTileVowel {
+    background: linear-gradient(160deg, #fefce8 0%, #fffbeb 60%, #fef3c7 100%);
+}
+
+.componentTileConsonant {
+    background: linear-gradient(160deg, #e0f2fe 0%, #e0f7ff 60%, #dbeafe 100%);
+}
+
+.componentTileSuffix {
+    background: linear-gradient(160deg, #f3e8ff 0%, #f5f3ff 60%, #ede9fe 100%);
+}
+
+.componentTileActive {
+    border-color: #818cf8;
+    box-shadow: 0 10px 30px rgba(51, 65, 85, 0.12);
+}
+
+.componentTile:hover {
+    transform: translateY(-1px);
+}
+
+.componentTitle {
+    display: block;
+    font-size: 0.85rem;
+    color: #475569;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.componentLetterLarge {
+    display: block;
+    font-size: 2.4rem;
+    font-weight: 400;
+    color: #0f172a;
+    line-height: 1.1;
+}
+
+.componentDetail {
+    margin-top: 0.35rem;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    transition: transform 120ms ease, box-shadow 180ms ease, border-color 120ms ease;
+}
+
+.componentDetail:hover {
+    transform: translateY(-1px);
+}
+
+.componentDetailTitle {
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 0.15rem;
+}
+
+.componentDetailGrid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.25rem 0.75rem;
+}
+
+.componentDetailRow {
+    display: contents;
+}
+
+.componentDetailRow dt {
+    font-weight: 600;
+    color: #475569;
+}
+
+.componentDetailRow dd {
+    margin: 0;
+    color: #0f172a;
+}
