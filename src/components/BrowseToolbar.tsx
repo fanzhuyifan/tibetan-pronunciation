@@ -1,6 +1,14 @@
 import { KIND_LABELS } from '../constants'
 
-export const BrowseToolbar = ({ kindFilter, setKindFilter, kindCounts, totalCount, filteredCount }) => {
+interface BrowseToolbarProps {
+    kindFilter: string;
+    setKindFilter: (kind: string) => void;
+    kindCounts: Record<string, number>;
+    totalCount: number;
+    filteredCount: number;
+}
+
+export const BrowseToolbar = ({ kindFilter, setKindFilter, kindCounts, totalCount, filteredCount }: BrowseToolbarProps) => {
     return (
         <div className="panel-header">
             <div>

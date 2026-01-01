@@ -1,6 +1,13 @@
 import './FlashcardPrompt.css'
+import { TibetanSyllable } from '../../tibetanSyllable'
 
-function FlashcardPrompt({ card, onToggleReveal, showAnswer }) {
+interface FlashcardPromptProps {
+    card: TibetanSyllable | null;
+    onToggleReveal: () => void;
+    showAnswer: boolean;
+}
+
+function FlashcardPrompt({ card, onToggleReveal, showAnswer }: FlashcardPromptProps) {
     const handleClick = () => onToggleReveal?.()
 
     return (

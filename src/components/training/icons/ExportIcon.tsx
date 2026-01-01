@@ -1,8 +1,10 @@
-function ImportIcon(props) {
+import { SVGProps } from 'react'
+
+function ExportIcon(props: SVGProps<SVGSVGElement>) {
     return (
         <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false" {...props}>
             <path
-                d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14v4H5z"
+                d="M12 3v12m0 0l-4-4m4 4l4-4M5 17h14v4H5z"
                 stroke="currentColor"
                 strokeWidth="1.8"
                 strokeLinecap="round"
@@ -13,4 +15,4 @@ function ImportIcon(props) {
     )
 }
 
-export default ImportIcon
+export default ExportIcon

@@ -1,7 +1,11 @@
-// Shared renderer for component detail rows to avoid duplicate markup.
 import styles from './ComponentDetail.module.css'
+import { DetailData } from './componentDetailUtils'
 
-function ComponentDetailContent({ detail }) {
+interface ComponentDetailContentProps {
+    detail: DetailData | null;
+}
+
+function ComponentDetailContent({ detail }: ComponentDetailContentProps) {
     if (!detail) return null
 
     return (

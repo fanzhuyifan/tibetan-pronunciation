@@ -1,11 +1,13 @@
-// Pronunciation helpers extracted for reuse across syllable utilities and components.
+import { Suffix } from '../data/tibetanData'
+
 const BASE_VOWELS = new Set(['a', 'e', 'i', 'o', 'u', 'ö', 'ü'])
 
-const isCombining = (ch) => /\p{M}/u.test(ch)
+const isCombining = (ch: string) => /\p{M}/u.test(ch)
 
-export const applyToneToPronunciation = (pron, tone) => {
+export const applyToneToPronunciation = (pron: string, tone: string): string => {
     if (!pron || !tone) return pron
     const toneMark = tone.at(-1)
+    if (!toneMark) return pron
     const chars = Array.from(pron)
 
     for (let i = 0; i < chars.length; i += 1) {
@@ -19,7 +21,7 @@ export const applyToneToPronunciation = (pron, tone) => {
     return pron
 }
 
-export const combinePronunciation = (basePron, vowelPron) => {
+export const combinePronunciation = (basePron: string, vowelPron: string): string => {
     if (!vowelPron || vowelPron === 'a') return basePron
     if (basePron.endsWith('a') && vowelPron !== 'a') {
         return `${basePron.slice(0, -1)}${vowelPron}`
@@ -27,7 +29,7 @@ export const combinePronunciation = (basePron, vowelPron) => {
     return `${basePron}${vowelPron}`
 }
 
-export const appendSuffixPronunciation = (pron, suffix) => {
+export const appendSuffixPronunciation = (pron: string, suffix: Suffix | null): string => {
     if (!suffix) return pron
     const extra =
         suffix.pronunciation ||
@@ -37,7 +39,7 @@ export const appendSuffixPronunciation = (pron, suffix) => {
     return `${pron}${extra}`
 }
 
-export const maybeAdjustVowelPronunciation = (vowelPron, suffix) => {
+export const maybeAdjustVowelPronunciation = (vowelPron: string, suffix: Suffix | null): string => {
     if (!suffix) return vowelPron
     const mapping = suffix.vowel_change
     if (typeof mapping !== 'object' || mapping === null) return vowelPron
@@ -45,7 +47,7 @@ export const maybeAdjustVowelPronunciation = (vowelPron, suffix) => {
     return mapping[current] ?? vowelPron
 }
 
-export const effectiveTone = (baseTone, suffix) => {
+export const effectiveTone = (baseTone: string, suffix: Suffix | null): string => {
     if (!suffix) return baseTone
     const toneChange = suffix.tone_change
     if (toneChange && typeof toneChange === 'object' && baseTone in toneChange) {
@@ -54,7 +56,7 @@ export const effectiveTone = (baseTone, suffix) => {
     return baseTone
 }
 
-export const applySuffixAdjustments = ({ vowelPron, baseTone, suffix }) => {
+export const applySuffixAdjustments = ({ vowelPron, baseTone, suffix }: { vowelPron: string, baseTone: string, suffix: Suffix | null }) => {
     const adjustedVowelPron = maybeAdjustVowelPronunciation(vowelPron, suffix)
     const tone = effectiveTone(baseTone, suffix)
     return { vowelPron: adjustedVowelPron, tone }

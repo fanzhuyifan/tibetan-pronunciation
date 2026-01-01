@@ -3,15 +3,22 @@ import { State } from 'ts-fsrs'
 import { formatTime } from '../utils'
 import { KIND_LABELS, STATE_LABELS } from '../constants'
 import ComponentDetailView from './training/ComponentDetailView'
+import { BrowseRowData } from '../hooks/useBrowseCards'
 
-const stateClassNames = {
+const stateClassNames: Record<number, string> = {
     [State.New]: 'state-new',
     [State.Learning]: 'state-learning',
     [State.Review]: 'state-review',
     [State.Relearning]: 'state-relearning',
 }
 
-const BrowseRow = memo(({ row, isSelected, onSelect }) => {
+interface BrowseRowProps {
+    row: BrowseRowData;
+    isSelected: boolean;
+    onSelect: (id: string) => void;
+}
+
+const BrowseRow = memo(({ row, isSelected, onSelect }: BrowseRowProps) => {
     const { id, kind, letter, card, due, intervalSeconds, meta } = row
 
     return (
@@ -26,10 +33,10 @@ const BrowseRow = memo(({ row, isSelected, onSelect }) => {
                 <div className="browse-card">
                     <div className="letter-symbol">{letter || '?'}</div>
                     <div className="letter-meta">
-                        <div className="letter-kind">{KIND_LABELS[kind] || 'Unknown'}</div>
-                        {meta?.wylie && <div className="letter-wylie">Wylie: {meta.wylie}</div>}
-                        {meta?.pronunciation && (
-                            <div className="letter-pron">Pron.: {meta.pronunciation}</div>
+                        <div className="letter-kind">{KIND_LABELS[kind || ''] || 'Unknown'}</div>
+                        {(meta as any)?.wylie && <div className="letter-wylie">Wylie: {(meta as any).wylie}</div>}
+                        {(meta as any)?.pronunciation && (
+                            <div className="letter-pron">Pron.: {(meta as any).pronunciation}</div>
                         )}
                     </div>
                 </div>
@@ -48,37 +55,31 @@ const BrowseRow = memo(({ row, isSelected, onSelect }) => {
                     <div className="due-sub">
                         {due
                             ? intervalSeconds <= 0
-                                ? 'Due now'
-                                : `Due in ${formatTime(intervalSeconds)}`
-                            : '--'}
+                                ? 'Overdue'
+                                : `in ${formatTime(intervalSeconds)}`
+                            : '—'}
                     </div>
                 </div>
 
                 <div className="browse-metrics">
-                    <div className="metric">
-                        <div className="metric-label">Stability</div>
-                        <div className="metric-value">
-                            {card?.stability != null ? card.stability.toFixed(1) : '--'}
-                        </div>
-                    </div>
-                    <div className="metric">
-                        <div className="metric-label">Difficulty</div>
-                        <div className="metric-value">
-                            {card?.difficulty != null ? card.difficulty.toFixed(1) : '--'}
-                        </div>
-                    </div>
+                    <div>S: {card?.stability?.toFixed(2) ?? '0.00'}</div>
+                    <div>D: {card?.difficulty?.toFixed(2) ?? '0.00'}</div>
                 </div>
             </div>
 
             {isSelected && (
-                <div className="browse-row-detail" onClick={() => onSelect(null)}>
-                    <ComponentDetailView kind={kind} letter={letter} />
+                <div
+                    className="browse-detail"
+                    onClick={() => onSelect(id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect(id)}
+                >
+                    <ComponentDetailView kind={kind || ''} letter={letter} />
                 </div>
             )}
         </div>
     )
 })
-
-BrowseRow.displayName = 'BrowseRow'
 
 export default BrowseRow

@@ -1,8 +1,13 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, ChangeEvent } from 'react'
+
+interface DeckInterface {
+    exportYaml: () => string;
+    importYaml: (text: string) => boolean;
+}
 
 // Encapsulates deck YAML import/export behaviors for reuse and to keep views lean.
-export function useDeckImportExport(deck) {
-    const fileInputRef = useRef(null)
+export function useDeckImportExport(deck: DeckInterface) {
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const handleExport = useCallback(() => {
         try {
@@ -26,7 +31,7 @@ export function useDeckImportExport(deck) {
     }, [deck])
 
     const handleImportFile = useCallback(
-        async (event) => {
+        async (event: ChangeEvent<HTMLInputElement>) => {
             const file = event.target.files?.[0]
             if (!file) return
 
@@ -38,7 +43,7 @@ export function useDeckImportExport(deck) {
                 console.error('Failed to import deck', error)
                 window.alert('Unable to import deck. Please verify the YAML file and try again.')
             } finally {
-                event.target.value = ''
+                if (event.target) event.target.value = ''
             }
         },
         [deck],
@@ -52,8 +57,6 @@ export function useDeckImportExport(deck) {
         fileInputRef,
         triggerImport,
         handleExport,
-        handleImportFile,
+        handleImportFile
     }
 }
-
-export default useDeckImportExport

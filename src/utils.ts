@@ -1,11 +1,11 @@
-import { consonants, vowels, suffixes } from './data/tibetanData'
+import { consonants, vowels, suffixes, Consonant, Vowel, Suffix } from './data/tibetanData'
 import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from './constants'
 
-export const storageAvailable = () => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+export const storageAvailable = (): boolean => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
 
-export const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
+export const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
 
-export const formatTime = (seconds) => {
+export const formatTime = (seconds: number): string => {
     if (seconds <= 0) return 'Now'
     if (seconds < 60) return `${Math.round(seconds)}s`
     const minutes = seconds / 60
@@ -20,15 +20,17 @@ export const formatTime = (seconds) => {
     return `${Math.round(years)}y`
 }
 
-export const createCardId = (kind, letter) => `${kind}:${letter}`
+export const createCardId = (kind: string, letter: string): string => `${kind}:${letter}`
 
-export const parseCardId = (id) => {
+export const parseCardId = (id: string | null | undefined): { kind: string | null, letter: string | null } => {
     if (!id) return { kind: null, letter: null }
     const [kind, letter] = id.split(':')
     return { kind, letter }
 }
 
-export const lookupMeta = (kind, letter) => {
+export type TibetanData = Consonant | Vowel | Suffix;
+
+export const lookupMeta = (kind: string | null, letter: string | null): TibetanData | null => {
     if (!letter) return null
     if (kind === KIND_CONSONANT) return consonants.find((c) => c.letter === letter) || null
     if (kind === KIND_VOWEL) return vowels.find((v) => v.letter === letter) || null

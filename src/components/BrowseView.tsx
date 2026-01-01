@@ -1,14 +1,19 @@
 import { useState, useCallback } from 'react'
+import { Card } from 'ts-fsrs'
 import { useBrowseCards } from '../hooks/useBrowseCards'
 import BrowseRow from './BrowseRow'
 import { BrowseToolbar } from './BrowseToolbar'
 import './BrowseView.css'
 
-function BrowseView({ cards }) {
-    const [selectedId, setSelectedId] = useState(null)
+interface BrowseViewProps {
+    cards: Map<string, Card>;
+}
+
+function BrowseView({ cards }: BrowseViewProps) {
+    const [selectedId, setSelectedId] = useState<string | null>(null)
     const { kindFilter, setKindFilter, filteredRows, kindCounts, rows } = useBrowseCards(cards)
 
-    const handleRowSelect = useCallback((id) => {
+    const handleRowSelect = useCallback((id: string) => {
         setSelectedId((prev) => (prev === id ? null : id))
     }, [])
 
@@ -44,4 +49,3 @@ function BrowseView({ cards }) {
 }
 
 export default BrowseView
-

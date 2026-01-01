@@ -3,7 +3,12 @@ import { buildDetail } from './componentDetailUtils'
 import ComponentDetailContent from './ComponentDetailContent'
 import styles from './ComponentDetail.module.css'
 
-function ComponentDetailView({ kind, letter }) {
+interface ComponentDetailViewProps {
+    kind: string;
+    letter: string | null;
+}
+
+function ComponentDetailView({ kind, letter }: ComponentDetailViewProps) {
     const detail = buildDetail(kind, letter)
     if (!detail) return null
 

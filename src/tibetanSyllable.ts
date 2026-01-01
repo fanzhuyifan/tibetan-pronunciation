@@ -1,4 +1,4 @@
-import { consonants as defaultConsonants, vowels as defaultVowels, suffixes as defaultSuffixes } from './data/tibetanData'
+import { consonants as defaultConsonants, vowels as defaultVowels, suffixes as defaultSuffixes, Consonant, Vowel, Suffix } from './data/tibetanData'
 import {
     applyToneToPronunciation,
     combinePronunciation,
@@ -14,18 +14,36 @@ export {
     applySuffixAdjustments,
 } from './utils/pronunciation'
 
-const consonantFromLetter = (letter, consonants) => {
+const consonantFromLetter = (letter: string, consonants: Consonant[]): Consonant | null => {
     return consonants.find((c) => c.letter === letter) || null
 }
 
-const stripWylie = (wylie) => {
+const stripWylie = (wylie: string): string => {
     return wylie.endsWith('a') ? wylie.slice(0, -1) : wylie
 }
 
-const emptyVowel = () => ({ letter: '', wylie: '', pronunciation: '' })
+const emptyVowel = (): Vowel => ({ letter: '', wylie: '', pronunciation: '' })
+
+export interface TibetanSyllableProps {
+    letter: string;
+    wylie: string;
+    pronunciation: string;
+    tone: string;
+    consonant: string;
+    vowel: string | null;
+    suffix: string | null;
+}
 
 export class TibetanSyllable {
-    constructor({ letter, wylie, pronunciation, tone, consonant, vowel, suffix }) {
+    letter: string;
+    wylie: string;
+    pronunciation: string;
+    tone: string;
+    consonant: string;
+    vowel: string | null;
+    suffix: string | null;
+
+    constructor({ letter, wylie, pronunciation, tone, consonant, vowel, suffix }: TibetanSyllableProps) {
         this.letter = letter
         this.wylie = wylie
         this.pronunciation = pronunciation
@@ -40,13 +58,13 @@ export class TibetanSyllable {
     }
 }
 
-const findEntry = (entries, field, value) => {
+const findEntry = <T>(entries: T[], field: keyof T, value: any): T => {
     const entry = entries.find((e) => e[field] === value)
     if (entry) return entry
-    throw new Error(`No entry with ${field}=${String(value)}`)
+    throw new Error(`No entry with ${String(field)}=${String(value)}`)
 }
 
-export const buildSyllable = (base, vowel, suffix = null, consonants = defaultConsonants) => {
+export const buildSyllable = (base: Consonant, vowel: Vowel | null, suffix: Suffix | null = null, consonants: Consonant[] = defaultConsonants): TibetanSyllable => {
     const resolvedVowel = vowel || emptyVowel()
 
     const baseLetter = base.letter || ''
@@ -92,13 +110,17 @@ export const buildSyllable = (base, vowel, suffix = null, consonants = defaultCo
 }
 
 export class TibetanSyllableFactory {
-    constructor({ consonants = defaultConsonants, vowels = defaultVowels, suffixes = defaultSuffixes } = {}) {
+    consonants: Consonant[];
+    vowels: Vowel[];
+    suffixes: Suffix[];
+
+    constructor({ consonants = defaultConsonants, vowels = defaultVowels, suffixes = defaultSuffixes }: { consonants?: Consonant[], vowels?: Vowel[], suffixes?: Suffix[] } = {}) {
         this.consonants = consonants
         this.vowels = vowels
         this.suffixes = suffixes
     }
 
-    fromParts(baseLetter, { vowel = '', suffix = '' } = {}) {
+    fromParts(baseLetter: string, { vowel = '', suffix = '' }: { vowel?: string, suffix?: string } = {}): TibetanSyllable {
         const base = findEntry(this.consonants, 'letter', baseLetter)
 
         const vowelEntry = vowel ? findEntry(this.vowels, 'letter', vowel) : emptyVowel()
@@ -107,7 +129,7 @@ export class TibetanSyllableFactory {
         return buildSyllable(base, vowelEntry, suffixEntry, this.consonants)
     }
 
-    fromTibetan(syllable) {
+    fromTibetan(syllable: string): TibetanSyllable {
         if (!syllable) throw new Error('Empty syllable')
 
         let trimmed = syllable
@@ -129,13 +151,13 @@ export class TibetanSyllableFactory {
                 suffixLetter = remainder[0]
             }
         }
-        return this.fromParts(baseLetter, { vowel: vowelLetter, suffix: suffixLetter, consonants: this.consonants })
+        return this.fromParts(baseLetter, { vowel: vowelLetter, suffix: suffixLetter })
     }
 
-    fromWylie(wylie) {
+    fromWylie(wylie: string): TibetanSyllable {
         if (!wylie) throw new Error('Empty wylie string')
 
-        let bestEntry = null
+        let bestEntry: Consonant | null = null
         let bestToken = ''
 
         for (const entry of this.consonants) {
@@ -156,8 +178,8 @@ export class TibetanSyllableFactory {
         }
 
         let remaining = wylie.slice(bestToken.length)
-        let vowel = null
-        let suffix = null
+        let vowel: Vowel | null = null
+        let suffix: Suffix | null = null
 
         if (remaining) {
             for (const v of this.vowels) {

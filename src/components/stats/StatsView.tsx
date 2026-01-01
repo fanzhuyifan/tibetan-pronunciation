@@ -1,11 +1,15 @@
-import { State } from 'ts-fsrs'
-import { KIND_COLORS, STATE_COLORS, KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
+import { State, Card } from 'ts-fsrs'
+import { STATE_COLORS, KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
 import './StatsView.css'
 import { Legend, StatCard } from './StatsComponents'
 import { ReviewForecast } from './ReviewForecast'
 import { useStats } from './useStats'
 
-function StatsView({ cards }) {
+interface StatsViewProps {
+    cards: Map<string, Card>;
+}
+
+function StatsView({ cards }: StatsViewProps) {
     const {
         stateCounts,
         kindCounts,
@@ -49,44 +53,19 @@ function StatsView({ cards }) {
                     breakdownData={kindByState[KIND_SUFFIX]}
                     colorMap={STATE_COLORS}
                 />
-            </div>
-
-            <Legend items={[
-                { label: 'Consonant', color: KIND_COLORS[KIND_CONSONANT] },
-                { label: 'Vowel', color: KIND_COLORS[KIND_VOWEL] },
-                { label: 'Suffix', color: KIND_COLORS[KIND_SUFFIX] },
-            ]} />
-            <div className="panel-grid">
                 <StatCard
-                    label="New Cards"
-                    value={stateCounts[State.New]}
-                    breakdownData={stateByKind[State.New]}
-                    colorMap={KIND_COLORS}
-                />
-                <StatCard
-                    label="Learning"
-                    value={stateCounts[State.Learning]}
-                    breakdownData={stateByKind[State.Learning]}
-                    colorMap={KIND_COLORS}
-                />
-                <StatCard
-                    label="Review"
-                    value={stateCounts[State.Review]}
-                    breakdownData={stateByKind[State.Review]}
-                    colorMap={KIND_COLORS}
-                />
-                <StatCard
-                    label="Relearning"
-                    value={stateCounts[State.Relearning]}
-                    breakdownData={stateByKind[State.Relearning]}
-                    colorMap={KIND_COLORS}
+                    label="Total"
+                    value={Object.values(stateCounts).reduce((a, b) => a + b, 0)}
+                    breakdownData={stateCounts}
+                    colorMap={STATE_COLORS}
                 />
             </div>
 
-            <ReviewForecast forecastData={forecastData} maxCount={maxCount} />
+            <div style={{ marginTop: '2rem' }}>
+                <ReviewForecast forecastData={forecastData} maxCount={maxCount} />
+            </div>
         </div>
     )
 }
-
 
 export default StatsView

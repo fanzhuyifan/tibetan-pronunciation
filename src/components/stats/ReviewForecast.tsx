@@ -1,4 +1,5 @@
 import React from 'react'
+import { ForecastItem } from './useStats'
 
 const KIND_COLORS = {
     consonant: '#3b82f6', // blue-500
@@ -6,7 +7,12 @@ const KIND_COLORS = {
     suffix: '#f59e0b',    // amber-500
 }
 
-export const ReviewForecast = ({ forecastData, maxCount }) => {
+interface ReviewForecastProps {
+    forecastData: ForecastItem[];
+    maxCount: number;
+}
+
+export const ReviewForecast = ({ forecastData, maxCount }: ReviewForecastProps) => {
     return (
         <div className="chart-container">
             <div className="chart-title">Review Forecast (14 Days)</div>

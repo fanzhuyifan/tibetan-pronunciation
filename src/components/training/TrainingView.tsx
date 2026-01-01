@@ -8,7 +8,11 @@ import MoreTraining from './MoreTraining'
 import TrainingBanner from './TrainingBanner'
 import './TrainingView.css'
 
-function TrainingView({ deck }) {
+interface TrainingViewProps {
+    deck: any;
+}
+
+function TrainingView({ deck }: TrainingViewProps) {
     const {
         currentCard,
         showAnswer,
@@ -23,7 +27,7 @@ function TrainingView({ deck }) {
     const { fileInputRef, triggerImport, handleExport, handleImportFile } = useDeckImportExport(deck)
 
     const newCardsAvailable = useMemo(
-        () => Array.from(deck?.stateCards?.values() ?? []).filter((card) => card.state === State.New).length,
+        () => Array.from((deck?.stateCards as Map<string, any>)?.values() ?? []).filter((card: any) => card.state === State.New).length,
         [deck],
     )
 
@@ -62,7 +66,7 @@ function TrainingView({ deck }) {
                         />
                     ) : (
                         <div className="answer-reveal">
-                                <button className="btn primary" onClick={actions.toggleReveal} title="Show answer (Space or Enter)">
+                            <button className="btn primary" onClick={actions.toggleReveal} title="Show answer (Space or Enter)">
                                 Show answer
                             </button>
                         </div>

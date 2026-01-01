@@ -2,7 +2,17 @@ import { useMemo, useState } from 'react'
 import { buildDetail } from './componentDetailUtils'
 import ComponentDetailContent from './ComponentDetailContent'
 import styles from './ComponentDetail.module.css'
-const ComponentTile = ({ kind, title, letter, onSelect, isActive }) => (
+import { TibetanSyllable } from '../../tibetanSyllable'
+
+interface ComponentTileProps {
+    kind: string;
+    title: string;
+    letter: string | null;
+    onSelect: (kind: string) => void;
+    isActive: boolean;
+}
+
+const ComponentTile = ({ kind, title, letter, onSelect, isActive }: ComponentTileProps) => (
     <button
         type="button"
         className={[
@@ -21,8 +31,12 @@ const ComponentTile = ({ kind, title, letter, onSelect, isActive }) => (
     </button>
 )
 
-function ComponentDetail({ card }) {
-    const [activeKind, setActiveKind] = useState(null)
+interface ComponentDetailProps {
+    card: TibetanSyllable | null;
+}
+
+function ComponentDetail({ card }: ComponentDetailProps) {
+    const [activeKind, setActiveKind] = useState<string | null>(null)
 
     const detail = useMemo(() => {
         if (!card || !activeKind) return null
@@ -39,7 +53,7 @@ function ComponentDetail({ card }) {
     if (!card) return null
 
 
-    const handleSelect = (kind, letter) => {
+    const handleSelect = (kind: string, letter: string | null) => {
         if (!letter) return
         setActiveKind(kind)
     }
@@ -58,7 +72,7 @@ function ComponentDetail({ card }) {
         />
     )
 
-    const vowelAbove = ['ི', 'ོ', 'ེ'].includes(card.vowel)
+    const vowelAbove = card.vowel ? ['ི', 'ོ', 'ེ'].includes(card.vowel) : false
 
     return (
         <>

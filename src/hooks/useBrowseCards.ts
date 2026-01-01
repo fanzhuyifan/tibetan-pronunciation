@@ -1,8 +1,19 @@
 import { useMemo, useState } from 'react'
+import { Card } from 'ts-fsrs'
 import { KIND_ORDER } from '../constants'
-import { lookupMeta, parseCardId } from '../utils'
+import { lookupMeta, parseCardId, TibetanData } from '../utils'
 
-export const useBrowseCards = (cards) => {
+export interface BrowseRowData {
+    id: string;
+    kind: string | null;
+    letter: string | null;
+    card: Card;
+    due: Date | null;
+    intervalSeconds: number;
+    meta: TibetanData | null;
+}
+
+export const useBrowseCards = (cards: Map<string, Card>) => {
     const [kindFilter, setKindFilter] = useState('all')
 
     const rows = useMemo(() => {
@@ -11,7 +22,7 @@ export const useBrowseCards = (cards) => {
             .map(([id, card]) => {
                 const { kind, letter } = parseCardId(id)
                 const due = card?.due ? new Date(card.due) : null
-                const intervalSeconds = due ? Math.max((due - now) / 1000, 0) : 0
+                const intervalSeconds = due ? Math.max((due.getTime() - now.getTime()) / 1000, 0) : 0
                 return {
                     id,
                     kind,
@@ -23,17 +34,18 @@ export const useBrowseCards = (cards) => {
                 }
             })
             .sort((a, b) => {
-                const kindA = KIND_ORDER[a.kind] ?? 99
-                const kindB = KIND_ORDER[b.kind] ?? 99
+                const kindA = KIND_ORDER[a.kind || ''] ?? 99
+                const kindB = KIND_ORDER[b.kind || ''] ?? 99
                 if (kindA !== kindB) return kindA - kindB
                 return (a.letter || '').localeCompare(b.letter || '')
             })
     }, [cards])
 
     const kindCounts = useMemo(() => {
-        const counts = { all: rows.length }
+        const counts: Record<string, number> = { all: rows.length }
         for (const row of rows) {
-            counts[row.kind] = (counts[row.kind] || 0) + 1
+            const k = row.kind || 'unknown'
+            counts[k] = (counts[k] || 0) + 1
         }
         return counts
     }, [rows])
@@ -48,6 +60,6 @@ export const useBrowseCards = (cards) => {
         setKindFilter,
         rows,
         filteredRows,
-        kindCounts,
+        kindCounts
     }
 }

@@ -1,15 +1,22 @@
 import './MoreTraining.css'
+import { ChangeEvent } from 'react'
 
 const REVIEW_AHEAD_OPTIONS = [0, 1, 2, 3, 7, 14, 30, 60, 90]
 
-function MoreTraining({ newCardsAvailable = 0, onChangeReviewAheadDays, onChangeNewCards }) {
-    const handleAheadChange = (event) => {
+interface MoreTrainingProps {
+    newCardsAvailable?: number;
+    onChangeReviewAheadDays?: (days: number) => void;
+    onChangeNewCards?: (count: number) => void;
+}
+
+function MoreTraining({ newCardsAvailable = 0, onChangeReviewAheadDays, onChangeNewCards }: MoreTrainingProps) {
+    const handleAheadChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const next = parseInt(event.target.value, 10)
         const safeValue = Number.isFinite(next) && next >= 0 ? next : 0
         if (onChangeReviewAheadDays) onChangeReviewAheadDays(safeValue)
     }
 
-    const handleNewCardsChange = (event) => {
+    const handleNewCardsChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const next = parseInt(event.target.value, 10)
         const safeValue = Number.isFinite(next) && next >= 0 ? next : 0
         const cappedValue = Math.min(safeValue, newCardsAvailable)

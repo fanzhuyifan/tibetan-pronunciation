@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Rating, State } from 'ts-fsrs'
+import { Rating, State, Card } from 'ts-fsrs'
 import { storageAvailable } from '../utils'
-import { TibetanSyllableFactory } from '../tibetanSyllable'
+import { TibetanSyllableFactory, TibetanSyllable } from '../tibetanSyllable'
+import { DeckCandidate } from './useFsrsDeck'
 
-const HOTKEY_TO_RATING = {
+const HOTKEY_TO_RATING: Record<string, Rating> = {
     '1': Rating.Again,
     '2': Rating.Hard,
     '3': Rating.Good,
@@ -26,7 +27,14 @@ const loadNewCardsToLearn = () => {
     }
 }
 
-const buildCurrentSyllable = (factory, parts) => {
+interface SyllableParts {
+    primary: DeckCandidate;
+    consonant?: DeckCandidate;
+    vowel?: DeckCandidate;
+    suffix?: DeckCandidate;
+}
+
+const buildCurrentSyllable = (factory: TibetanSyllableFactory, parts: SyllableParts | null): TibetanSyllable | null => {
     if (!parts?.consonant?.letter) return null
     return factory.fromParts(parts.consonant.letter, {
         vowel: parts.vowel?.letter || '',
@@ -34,7 +42,14 @@ const buildCurrentSyllable = (factory, parts) => {
     })
 }
 
-export function useTrainingSession(deck) {
+interface DeckInterface {
+    stateCards: Map<string, Card>;
+    rateMany: (ids: string[], rating: Rating) => void;
+    getNextSyllable: (predicate?: ((c: DeckCandidate) => boolean) | null) => SyllableParts | null;
+    calculateDueDate: (card: Card | undefined, rating: Rating) => Date | null;
+}
+
+export function useTrainingSession(deck: DeckInterface) {
     const { stateCards: cards, rateMany, getNextSyllable, calculateDueDate } = deck || {}
     const [showAnswer, setShowAnswer] = useState(false)
     const [newCardsToLearn, setNewCardsToLearn] = useState(() => loadNewCardsToLearn())
@@ -49,12 +64,12 @@ export function useTrainingSession(deck) {
         return date
     }, [reviewAheadDays])
 
-    const dueDatePredicate = useCallback((card) => {
-        const dueDate = card.due ? new Date(card.due) : new Date() - 1
+    const dueDatePredicate = useCallback((card: Card) => {
+        const dueDate = card.due ? new Date(card.due) : new Date(Date.now() - 1)
         return dueDate && dueDate <= dueDateCutOff
     }, [dueDateCutOff])
 
-    const persistNewCardsToLearn = useCallback((value) => {
+    const persistNewCardsToLearn = useCallback((value: number) => {
         if (!storageAvailable()) return
 
         try {
@@ -64,13 +79,13 @@ export function useTrainingSession(deck) {
         }
     }, [])
 
-    const updateNewCardsToLearn = useCallback((value) => {
+    const updateNewCardsToLearn = useCallback((value: number) => {
         const safeValue = Number.isFinite(value) && value >= 0 ? value : 0
         setNewCardsToLearn(safeValue)
         persistNewCardsToLearn(safeValue)
     }, [persistNewCardsToLearn])
 
-    const updateReviewAheadDays = useCallback((value) => {
+    const updateReviewAheadDays = useCallback((value: number) => {
         const safeValue = Number.isFinite(value) && value >= 0 ? value : 0
         setReviewAheadDays(safeValue)
     }, [])
@@ -90,17 +105,19 @@ export function useTrainingSession(deck) {
     }, [])
 
     const handleFsrsRating = useCallback(
-        (rating) => {
+        (rating: Rating) => {
             if (!syllable || !rateMany) return
 
-            const targets = []
-            for (const key of Object.keys(syllable)) {
-                if (key === 'primary') continue
-                const variant = syllable[key]
+            const targets: string[] = []
+            const keys: (keyof SyllableParts)[] = ['consonant', 'vowel', 'suffix']
+
+            keys.forEach(key => {
+                const variant = syllable[key];
                 if (variant?.card) {
                     targets.push(variant.id)
                 }
-            }
+            })
+
             if (!targets.length) return
 
             rateMany(targets, rating)
@@ -116,7 +133,7 @@ export function useTrainingSession(deck) {
 
     // Keyboard shortcuts
     useEffect(() => {
-        const handler = (event) => {
+        const handler = (event: KeyboardEvent) => {
             const key = event.key
 
             if (!showAnswer && (key === ' ' || key === 'Enter')) {
@@ -167,7 +184,7 @@ export function useTrainingSession(deck) {
     const predictedNextDueDates = useMemo(() => {
         if (!syllable || !syllable.primary?.card) return null
         const card = syllable.primary.card
-        const dates = {}
+        const dates: Record<number, Date | null> = {}
         for (const rating of [Rating.Again, Rating.Hard, Rating.Good, Rating.Easy]) {
             const dueDate = calculateDueDate(card, rating)
             dates[rating] = dueDate

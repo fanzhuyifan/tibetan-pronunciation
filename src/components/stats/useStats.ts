@@ -1,45 +1,61 @@
-import { State } from 'ts-fsrs'
+import { State, Card } from 'ts-fsrs'
 import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
 import { parseCardId } from '../../utils'
 
-export const useStats = (cards) => {
+interface DayCounts {
+    total: number;
+    [KIND_CONSONANT]: number;
+    [KIND_VOWEL]: number;
+    [KIND_SUFFIX]: number;
+}
+
+export interface ForecastItem {
+    date: Date;
+    count: number;
+    consonant: number;
+    vowel: number;
+    suffix: number;
+    label: string;
+}
+
+export const useStats = (cards: Map<string, Card>) => {
     const now = new Date()
     const today = new Date(now)
     today.setHours(0, 0, 0, 0)
 
-    const stateCounts = {
+    const stateCounts: Record<number, number> = {
         [State.New]: 0,
         [State.Learning]: 0,
         [State.Review]: 0,
         [State.Relearning]: 0,
     }
 
-    const kindCounts = {
+    const kindCounts: Record<string, number> = {
         [KIND_CONSONANT]: 0,
         [KIND_VOWEL]: 0,
         [KIND_SUFFIX]: 0,
     }
 
-    const stateByKind = {
+    const stateByKind: Record<number, Record<string, number>> = {
         [State.New]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
         [State.Learning]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
         [State.Review]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
         [State.Relearning]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
     }
 
-    const kindByState = {
+    const kindByState: Record<string, Record<number, number>> = {
         [KIND_CONSONANT]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
         [KIND_VOWEL]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
         [KIND_SUFFIX]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
     }
 
-    const counts = new Map()
+    const counts = new Map<number, DayCounts>()
 
     cards.forEach((card, id) => {
         stateCounts[card.state] = (stateCounts[card.state] || 0) + 1
 
         const { kind } = parseCardId(id)
-        if (kindCounts[kind] !== undefined) {
+        if (kind && kindCounts[kind] !== undefined) {
             kindCounts[kind]++
 
             if (stateByKind[card.state]) {
@@ -48,26 +64,26 @@ export const useStats = (cards) => {
             if (kindByState[kind]) {
                 kindByState[kind][card.state] = (kindByState[kind][card.state] || 0) + 1
             }
-        }
 
-        if (card.state != State.New) {
-            let due = new Date(card.due)
-            if (due < now) due = now
+            if (card.state !== State.New) {
+                let due = new Date(card.due)
+                if (due < now) due = now
 
-            const d = new Date(due)
-            d.setHours(0, 0, 0, 0)
-            const key = d.getTime()
+                const d = new Date(due)
+                d.setHours(0, 0, 0, 0)
+                const key = d.getTime()
 
-            const dayCounts = counts.get(key) || { total: 0, [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 }
-            dayCounts.total++
-            if (dayCounts[kind] !== undefined) {
-                dayCounts[kind]++
+                const dayCounts = counts.get(key) || { total: 0, [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 }
+                dayCounts.total++
+                if (dayCounts[kind] !== undefined) {
+                    dayCounts[kind]++
+                }
+                counts.set(key, dayCounts)
             }
-            counts.set(key, dayCounts)
         }
     })
 
-    const forecastData = []
+    const forecastData: ForecastItem[] = []
     const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
 
     for (let i = 0; i < 14; i++) {

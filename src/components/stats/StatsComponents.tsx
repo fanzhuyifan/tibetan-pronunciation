@@ -1,6 +1,12 @@
 import React from 'react'
 
-export const StackedBar = ({ data, total, colorMap }) => {
+interface StackedBarProps {
+    data: Record<string | number, number>;
+    total: number;
+    colorMap: Record<string | number, string>;
+}
+
+export const StackedBar = ({ data, total, colorMap }: StackedBarProps) => {
     if (total === 0) return <div className="stacked-bar" style={{ opacity: 0.3 }} />
 
     return (
@@ -24,7 +30,16 @@ export const StackedBar = ({ data, total, colorMap }) => {
     )
 }
 
-export const Legend = ({ items }) => (
+interface LegendItem {
+    label: string;
+    color: string;
+}
+
+interface LegendProps {
+    items: LegendItem[];
+}
+
+export const Legend = ({ items }: LegendProps) => (
     <div className="legend-container">
         {items.map(({ label, color }) => (
             <div key={label} className="legend-item">
@@ -35,7 +50,14 @@ export const Legend = ({ items }) => (
     </div>
 )
 
-export const StatCard = ({ label, value, breakdownData, colorMap }) => (
+interface StatCardProps {
+    label: string;
+    value: number;
+    breakdownData: Record<string | number, number>;
+    colorMap: Record<string | number, string>;
+}
+
+export const StatCard = ({ label, value, breakdownData, colorMap }: StatCardProps) => (
     <div className="panel-card">
         <div className="stat-label">{label}</div>
         <div className="stat-value">{value}</div>

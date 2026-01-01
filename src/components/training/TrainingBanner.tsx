@@ -2,13 +2,21 @@ import ExportIcon from './icons/ExportIcon'
 import ImportIcon from './icons/ImportIcon'
 import './TrainingBanner.css'
 
+interface TrainingBannerProps {
+    newCardsToLearn?: number;
+    reviewsDue?: number;
+    learningCardsDue?: number;
+    onImportClick: () => void;
+    onExportClick: () => void;
+}
+
 function TrainingBanner({
     newCardsToLearn = 0,
     reviewsDue = 0,
     learningCardsDue = 0,
     onImportClick,
     onExportClick,
-}) {
+}: TrainingBannerProps) {
     const safeNewCardsValue = Number.isFinite(newCardsToLearn) ? newCardsToLearn : 0
 
     return (

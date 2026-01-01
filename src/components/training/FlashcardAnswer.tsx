@@ -1,8 +1,16 @@
 import './FlashcardAnswer.css'
 import RatingControls from './RatingControls'
 import ComponentDetail from './ComponentDetail'
+import { TibetanSyllable } from '../../tibetanSyllable'
+import { Rating } from 'ts-fsrs'
 
-function FlashcardAnswer({ card, predictedNextDueDates, onRate }) {
+interface FlashcardAnswerProps {
+    card: TibetanSyllable | null;
+    predictedNextDueDates: Record<number, Date | null> | null;
+    onRate: (rating: Rating) => void;
+}
+
+function FlashcardAnswer({ card, predictedNextDueDates, onRate }: FlashcardAnswerProps) {
     if (!card) return null
 
     return (

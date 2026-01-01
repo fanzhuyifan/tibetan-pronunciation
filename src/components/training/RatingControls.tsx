@@ -9,7 +9,14 @@ const ratingButtons = [
     { label: 'Easy', rating: Rating.Easy, hotkey: '4' },
 ]
 
-function RatingControls({ showAnswer, predictedNextDueDates, onToggleReveal, onRate }) {
+interface RatingControlsProps {
+    showAnswer: boolean;
+    predictedNextDueDates: Record<number, Date | null> | null;
+    onToggleReveal?: () => void;
+    onRate: (rating: Rating) => void;
+}
+
+function RatingControls({ showAnswer, predictedNextDueDates, onToggleReveal, onRate }: RatingControlsProps) {
 
     if (!showAnswer) {
         return (
@@ -26,7 +33,7 @@ function RatingControls({ showAnswer, predictedNextDueDates, onToggleReveal, onR
         <div className="fsrs-actions">
             {ratingButtons.map((btn) => {
                 const due = predictedNextDueDates?.[btn.rating]
-                const interval = due ? (new Date(due) - new Date()) / 1000 : 0
+                const interval = due ? (new Date(due).getTime() - new Date().getTime()) / 1000 : 0
                 const timeLabel = due ? formatTime(interval) : '-'
 
                 return (
