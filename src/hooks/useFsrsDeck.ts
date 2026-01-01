@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { createEmptyCard, fsrs, generatorParameters, Card, Rating } from 'ts-fsrs'
+import { createEmptyCard, fsrs, generatorParameters, Card, Rating, Grade } from 'ts-fsrs'
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml'
 import { consonants as defaultConsonants, vowels as defaultVowels, suffixes as defaultSuffixes, Consonant, Vowel, Suffix } from '../data/tibetanData'
 import { storageAvailable, createCardId, parseCardId } from '../utils'
@@ -150,7 +150,7 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
         ids.forEach((id) => {
             const card = stateCards.get(id)
             if (!card) return
-            const result = scheduler.next(card, now, rating)
+            const result = scheduler.next(card, now, rating as Grade)
             nextCards.set(id, result.card)
         })
         persistDeck(nextCards)
@@ -166,7 +166,7 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
             last_review: card?.last_review ? new Date(card.last_review) : undefined,
         }
 
-        const result = scheduler.next(hydratedCard, now, rating)
+        const result = scheduler.next(hydratedCard, now, rating as Grade)
         return result?.card?.due ?? null
     }
 

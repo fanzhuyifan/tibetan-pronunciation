@@ -6,7 +6,7 @@ const isCombining = (ch: string) => /\p{M}/u.test(ch)
 
 export const applyToneToPronunciation = (pron: string, tone: string): string => {
     if (!pron || !tone) return pron
-    const toneMark = tone.at(-1)
+    const toneMark = tone.slice(-1)[0]
     if (!toneMark) return pron
     const chars = Array.from(pron)
 

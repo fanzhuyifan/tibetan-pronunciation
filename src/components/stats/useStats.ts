@@ -4,9 +4,7 @@ import { parseCardId } from '../../utils'
 
 interface DayCounts {
     total: number;
-    [KIND_CONSONANT]: number;
-    [KIND_VOWEL]: number;
-    [KIND_SUFFIX]: number;
+    [key: string]: number;
 }
 
 export interface ForecastItem {

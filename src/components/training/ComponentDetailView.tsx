@@ -1,4 +1,3 @@
-import React from 'react'
 import { buildDetail } from './componentDetailUtils'
 import ComponentDetailContent from './ComponentDetailContent'
 import styles from './ComponentDetail.module.css'

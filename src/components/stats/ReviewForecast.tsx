@@ -1,4 +1,3 @@
-import React from 'react'
 import { ForecastItem } from './useStats'
 
 const KIND_COLORS = {

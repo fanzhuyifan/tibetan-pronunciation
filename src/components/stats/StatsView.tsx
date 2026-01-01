@@ -13,7 +13,6 @@ function StatsView({ cards }: StatsViewProps) {
     const {
         stateCounts,
         kindCounts,
-        stateByKind,
         kindByState,
         forecastData,
         maxCount
