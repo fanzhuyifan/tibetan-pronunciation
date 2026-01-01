@@ -47,7 +47,7 @@ function TrainingView({ deck }: TrainingViewProps) {
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".yaml,.yml,text/yaml,text/x-yaml"
+                    accept=".yaml,.yml,.yaml.gz,.yml.gz,.gz,text/yaml,text/x-yaml,application/gzip"
                     onChange={handleImportFile}
                     style={{ display: 'none' }}
                 />
