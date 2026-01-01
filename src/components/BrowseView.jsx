@@ -41,6 +41,8 @@ const lookupMeta = (kind, letter) => {
 
 function BrowseView({ cards }) {
     const [selectedId, setSelectedId] = useState(null)
+    const [kindFilter, setKindFilter] = useState('all')
+
     const rows = useMemo(() => {
         const now = new Date()
         return Array.from(cards?.entries?.() || [])
@@ -66,6 +68,19 @@ function BrowseView({ cards }) {
             })
     }, [cards])
 
+    const kindCounts = useMemo(() => {
+        const counts = { all: rows.length }
+        for (const row of rows) {
+            counts[row.kind] = (counts[row.kind] || 0) + 1
+        }
+        return counts
+    }, [rows])
+
+    const filteredRows = useMemo(() => {
+        if (kindFilter === 'all') return rows
+        return rows.filter((row) => row.kind === kindFilter)
+    }, [kindFilter, rows])
+
     const handleRowSelect = useCallback((id) => {
         setSelectedId((prev) => (prev === id ? null : id))
     }, [])
@@ -77,7 +92,22 @@ function BrowseView({ cards }) {
                     <div className="browse-title">Browse cards</div>
                     <p className="browse-subtitle">Inspect every consonant, vowel, and suffix.</p>
                 </div>
-                <div className="browse-count">{rows.length} total</div>
+                <div className="browse-actions">
+                    <div className="browse-filters" role="group" aria-label="Filter by card kind">
+                        {['all', 'consonant', 'vowel', 'suffix'].map((kind) => (
+                            <button
+                                key={kind}
+                                type="button"
+                                className={`browse-filter ${kindFilter === kind ? 'is-active' : ''}`}
+                                onClick={() => setKindFilter(kind)}
+                            >
+                                {kind === 'all' ? 'All' : kindLabels[kind] || 'Unknown'}
+                                <span className="filter-count">{kindCounts[kind] ?? 0}</span>
+                            </button>
+                        ))}
+                    </div>
+                    <div className="browse-count">{filteredRows.length} shown / {rows.length} total</div>
+                </div>
             </div>
 
             <div className="browse-table">
@@ -88,7 +118,7 @@ function BrowseView({ cards }) {
                     <div>Metrics</div>
                 </div>
 
-                {rows.map((row) => (
+                {filteredRows.map((row) => (
                     <div key={row.id}>
                         <div
                             className={`browse-row ${selectedId === row.id ? 'is-selected' : ''}`}

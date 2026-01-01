@@ -21,6 +21,54 @@
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
+.browse-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.browse-filters {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.browse-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #0f172a;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.browse-filter:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 8px 18px rgba(51, 65, 85, 0.12);
+}
+
+.browse-filter.is-active {
+    background: #312e81;
+    color: #f8fafc;
+    border-color: #312e81;
+    box-shadow: 0 10px 24px rgba(49, 46, 129, 0.2);
+}
+
+.filter-count {
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+    font-size: 0.85rem;
+    font-weight: 800;
+}
 .browse-title {
     font-size: 1.1rem;
     font-weight: 700;
