@@ -29,9 +29,9 @@ const loadNewCardsToLearn = () => {
 
 interface SyllableParts {
     primary: DeckCandidate;
-    consonant?: DeckCandidate;
-    vowel?: DeckCandidate;
-    suffix?: DeckCandidate;
+    consonant?: DeckCandidate | null;
+    vowel?: DeckCandidate | null;
+    suffix?: DeckCandidate | null;
 }
 
 const buildCurrentSyllable = (factory: TibetanSyllableFactory, parts: SyllableParts | null): TibetanSyllable | null => {

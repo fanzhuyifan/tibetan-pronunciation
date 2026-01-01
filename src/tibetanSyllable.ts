@@ -58,7 +58,7 @@ export class TibetanSyllable {
     }
 }
 
-const findEntry = <T>(entries: T[], field: keyof T, value: any): T => {
+const findEntry = <T>(entries: T[], field: keyof T, value: T[keyof T]): T => {
     const entry = entries.find((e) => e[field] === value)
     if (entry) return entry
     throw new Error(`No entry with ${String(field)}=${String(value)}`)

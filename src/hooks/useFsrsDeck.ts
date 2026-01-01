@@ -20,10 +20,11 @@ interface SerializedDeckItem {
 }
 
 const serializeCard = (card: Card): SerializedCard => {
-    const copy: any = { ...card }
-    if (copy.due instanceof Date) copy.due = copy.due.toISOString()
-    if (copy.last_review instanceof Date) copy.last_review = copy.last_review.toISOString()
-    return copy as SerializedCard
+    return {
+        ...card,
+        due: card.due instanceof Date ? card.due.toISOString() : (card.due as unknown as string),
+        last_review: card.last_review instanceof Date ? card.last_review.toISOString() : undefined,
+    }
 }
 
 const serializeDeck = (cards: Map<string, Card>): SerializedDeckItem[] => Array.from(cards.entries()).map(([id, card]) => {
@@ -37,11 +38,12 @@ const serializeDeck = (cards: Map<string, Card>): SerializedDeckItem[] => Array.
 })
 
 const hydrateCard = (card: SerializedCard): Card => {
-    if (!card) return card as any
-    const hydrated: any = { ...card }
-    if (hydrated.due) hydrated.due = new Date(hydrated.due)
-    if (hydrated.last_review) hydrated.last_review = new Date(hydrated.last_review)
-    return hydrated as Card
+    if (!card) return card as unknown as Card
+    return {
+        ...card,
+        due: new Date(card.due),
+        last_review: card.last_review ? new Date(card.last_review) : undefined,
+    } as Card
 }
 
 const ensureDeck = (consonants: Consonant[], vowels: Vowel[], suffixes: Suffix[], existingCards: Map<string, Card>): Map<string, Card> => {
@@ -189,8 +191,8 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
             const rows = Array.isArray(parsed?.cards) ? parsed.cards : (Array.isArray(parsed) ? parsed : [])
             const nextCards = new Map<string, Card>()
 
-            rows.forEach((row: any) => {
-                const { id, card } = row || {}
+            rows.forEach((row: unknown) => {
+                const { id, card } = (row as { id?: string; card?: SerializedCard }) || {}
                 if (!id || !card) return
                 nextCards.set(id, hydrateCard(card))
             })
@@ -257,3 +259,5 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
         importYaml,
     }
 }
+
+export type FsrsDeckHook = ReturnType<typeof useFsrsDeck>

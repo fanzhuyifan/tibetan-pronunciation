@@ -1,6 +1,6 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { State } from 'ts-fsrs'
-import { formatTime } from '../utils'
+import { formatTime, TibetanData } from '../utils'
 import { KIND_LABELS, STATE_LABELS } from '../constants'
 import ComponentDetailView from './training/ComponentDetailView'
 import { BrowseRowData } from '../hooks/useBrowseCards'
@@ -21,6 +21,15 @@ interface BrowseRowProps {
 const BrowseRow = memo(({ row, isSelected, onSelect }: BrowseRowProps) => {
     const { id, kind, letter, card, due, intervalSeconds, meta } = row
 
+    const { wylie, pronunciation } = useMemo(() => {
+        const m = meta as TibetanData | null
+        if (!m) return { wylie: undefined, pronunciation: undefined }
+        return {
+            wylie: 'wylie' in m ? m.wylie : undefined,
+            pronunciation: 'pronunciation' in m ? m.pronunciation : undefined,
+        }
+    }, [meta])
+
     return (
         <div>
             <div
@@ -34,9 +43,9 @@ const BrowseRow = memo(({ row, isSelected, onSelect }: BrowseRowProps) => {
                     <div className="letter-symbol">{letter || '?'}</div>
                     <div className="letter-meta">
                         <div className="letter-kind">{KIND_LABELS[kind || ''] || 'Unknown'}</div>
-                        {(meta as any)?.wylie && <div className="letter-wylie">Wylie: {(meta as any).wylie}</div>}
-                        {(meta as any)?.pronunciation && (
-                            <div className="letter-pron">Pron.: {(meta as any).pronunciation}</div>
+                        {wylie && <div className="letter-wylie">Wylie: {wylie}</div>}
+                        {pronunciation && (
+                            <div className="letter-pron">Pron.: {pronunciation}</div>
                         )}
                     </div>
                 </div>

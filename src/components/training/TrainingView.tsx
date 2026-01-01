@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { State } from 'ts-fsrs'
 import { useTrainingSession } from '../../hooks/useTrainingSession'
 import { useDeckImportExport } from '../../hooks/useDeckImportExport'
+import { FsrsDeckHook } from '../../hooks/useFsrsDeck'
 import FlashcardAnswer from './FlashcardAnswer'
 import FlashcardPrompt from './FlashcardPrompt'
 import MoreTraining from './MoreTraining'
@@ -9,7 +10,7 @@ import TrainingBanner from './TrainingBanner'
 import './TrainingView.css'
 
 interface TrainingViewProps {
-    deck: any;
+    deck: FsrsDeckHook;
 }
 
 function TrainingView({ deck }: TrainingViewProps) {
@@ -27,7 +28,7 @@ function TrainingView({ deck }: TrainingViewProps) {
     const { fileInputRef, triggerImport, handleExport, handleImportFile } = useDeckImportExport(deck)
 
     const newCardsAvailable = useMemo(
-        () => Array.from((deck?.stateCards as Map<string, any>)?.values() ?? []).filter((card: any) => card.state === State.New).length,
+        () => Array.from(deck.stateCards.values()).filter((card) => card.state === State.New).length,
         [deck],
     )
 

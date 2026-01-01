@@ -1,4 +1,5 @@
 import { consonants, vowels, suffixes, Consonant, Vowel, Suffix } from '../../data/tibetanData'
+import { TibetanData } from '../../utils'
 
 export const formatMapping = (mapping: Record<string, string> | undefined): string => {
     if (!mapping || typeof mapping !== 'object') return ''
@@ -7,7 +8,7 @@ export const formatMapping = (mapping: Record<string, string> | undefined): stri
         .join(', ')
 }
 
-const dataByKind: Record<string, any[]> = {
+const dataByKind: Record<string, TibetanData[]> = {
     consonant: consonants,
     vowel: vowels,
     suffix: suffixes,
