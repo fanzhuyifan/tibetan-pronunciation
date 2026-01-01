@@ -2,23 +2,11 @@ import { useCallback, useMemo, useState } from 'react'
 import { createEmptyCard, fsrs, generatorParameters } from 'ts-fsrs'
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml'
 import { consonants as defaultConsonants, vowels as defaultVowels, suffixes as defaultSuffixes } from '../data/tibetanData'
-import { storageAvailable } from '../utils'
+import { storageAvailable, createCardId, parseCardId } from '../utils'
+import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_ORDER } from '../constants'
 
 
 const STORAGE_KEY = 'tibetanFsrsDeck'
-const KIND_CONSONANT = 'consonant'
-const KIND_VOWEL = 'vowel'
-const KIND_SUFFIX = 'suffix'
-
-const priorityForKind = {
-    [KIND_CONSONANT]: 0,
-    [KIND_VOWEL]: 1,
-    [KIND_SUFFIX]: 2,
-}
-
-
-const letterKindToId = (letter, kind) => `${kind}:${letter}`
-const idToLetterKind = (id) => id.split(':')
 
 /**
  * Prepare a card for storage by converting date-like fields to ISO strings.
@@ -34,12 +22,15 @@ const serializeCard = (card) => {
  * Convert a Map of cards into a flat, serializable array that also includes
  * the derived letter/kind metadata for easier hydration.
  */
-const serializeDeck = (cards) => Array.from(cards.entries()).map(([id, card]) => ({
-    id,
-    letter: idToLetterKind(id)[1],
-    card: serializeCard(card),
-    kind: idToLetterKind(id)[0] || null,
-}))
+const serializeDeck = (cards) => Array.from(cards.entries()).map(([id, card]) => {
+    const { kind, letter } = parseCardId(id)
+    return {
+        id,
+        letter,
+        card: serializeCard(card),
+        kind,
+    }
+})
 
 /**
  * Convert persisted card-like data back into Date-aware objects.
@@ -64,7 +55,7 @@ const ensureDeck = (consonants, vowels, suffixes, existingCards) => {
         items.forEach((item) => {
             const letter = item?.letter
             if (!letter) return
-            const id = letterKindToId(letter, kind)
+            const id = createCardId(kind, letter)
             cards.set(id, existingCards.get(id) || createEmptyCard())
         })
     }
@@ -132,7 +123,7 @@ export function useFsrsDeck(consonants = defaultConsonants, vowels = defaultVowe
         let best = null
 
         stateCards.forEach((card, id) => {
-            const [kind, letter] = idToLetterKind(id)
+            const { kind, letter } = parseCardId(id)
             const candidate = { id, card, kind, letter }
 
             if (predicate && !predicate(candidate)) return
@@ -144,8 +135,8 @@ export function useFsrsDeck(consonants = defaultConsonants, vowels = defaultVowe
                 return
             }
 
-            const bestPriority = priorityForKind[best.kind] ?? 99
-            const thisPriority = priorityForKind[kind] ?? 99
+            const bestPriority = KIND_ORDER[best.kind] ?? 99
+            const thisPriority = KIND_ORDER[kind] ?? 99
             const bestDue = best.dueTime ?? (best.card?.due ? new Date(best.card.due).getTime() : Number.POSITIVE_INFINITY)
 
             if (thisPriority < bestPriority || (thisPriority === bestPriority && dueTime < bestDue)) {
@@ -232,7 +223,7 @@ export function useFsrsDeck(consonants = defaultConsonants, vowels = defaultVowe
         const partner = (targetKind) => {
             const candidates = []
             stateCards.forEach((card, id) => {
-                const [k, letter] = idToLetterKind(id)
+                const { kind: k, letter } = parseCardId(id)
                 if (k === targetKind) {
                     candidates.push({ id, card, kind: k, letter })
                 }

@@ -1,3 +1,6 @@
+import { consonants, vowels, suffixes } from './data/tibetanData'
+import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from './constants'
+
 export const storageAvailable = () => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
 
 export const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
@@ -16,3 +19,20 @@ export const formatTime = (seconds) => {
     const years = days / 365
     return `${Math.round(years)}y`
 }
+
+export const createCardId = (kind, letter) => `${kind}:${letter}`
+
+export const parseCardId = (id) => {
+    if (!id) return { kind: null, letter: null }
+    const [kind, letter] = id.split(':')
+    return { kind, letter }
+}
+
+export const lookupMeta = (kind, letter) => {
+    if (!letter) return null
+    if (kind === KIND_CONSONANT) return consonants.find((c) => c.letter === letter) || null
+    if (kind === KIND_VOWEL) return vowels.find((v) => v.letter === letter) || null
+    if (kind === KIND_SUFFIX) return suffixes.find((s) => s.letter === letter) || null
+    return null
+}
+

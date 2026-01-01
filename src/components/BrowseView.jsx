@@ -1,114 +1,26 @@
-import { useMemo, useState, useCallback } from 'react'
-import { State } from 'ts-fsrs'
-import { consonants, vowels, suffixes } from '../data/tibetanData'
-import { formatTime } from '../utils'
+import { useState, useCallback } from 'react'
+import { useBrowseCards } from '../hooks/useBrowseCards'
+import BrowseRow from './BrowseRow'
+import { BrowseToolbar } from './BrowseToolbar'
 import './BrowseView.css'
-import ComponentDetailView from './training/ComponentDetailView'
-
-const kindLabels = {
-    consonant: 'Consonant',
-    vowel: 'Vowel',
-    suffix: 'Suffix',
-}
-
-const kindOrder = {
-    consonant: 0,
-    vowel: 1,
-    suffix: 2,
-}
-
-const stateLabels = {
-    [State.New]: 'New',
-    [State.Learning]: 'Learning',
-    [State.Review]: 'Review',
-    [State.Relearning]: 'Relearning',
-}
-
-const stateClassNames = {
-    [State.New]: 'state-new',
-    [State.Learning]: 'state-learning',
-    [State.Review]: 'state-review',
-    [State.Relearning]: 'state-relearning',
-}
-
-const lookupMeta = (kind, letter) => {
-    if (!letter) return null
-    if (kind === 'consonant') return consonants.find((c) => c.letter === letter) || null
-    if (kind === 'vowel') return vowels.find((v) => v.letter === letter) || null
-    if (kind === 'suffix') return suffixes.find((s) => s.letter === letter) || null
-    return null
-}
 
 function BrowseView({ cards }) {
     const [selectedId, setSelectedId] = useState(null)
-    const [kindFilter, setKindFilter] = useState('all')
-
-    const rows = useMemo(() => {
-        const now = new Date()
-        return Array.from(cards?.entries?.() || [])
-            .map(([id, card]) => {
-                const [kind, letter] = (id || '').split(':')
-                const due = card?.due ? new Date(card.due) : null
-                const intervalSeconds = due ? Math.max((due - now) / 1000, 0) : 0
-                return {
-                    id,
-                    kind,
-                    letter,
-                    card,
-                    due,
-                    intervalSeconds,
-                    meta: lookupMeta(kind, letter),
-                }
-            })
-            .sort((a, b) => {
-                const kindA = kindOrder[a.kind] ?? 99
-                const kindB = kindOrder[b.kind] ?? 99
-                if (kindA !== kindB) return kindA - kindB
-                return (a.letter || '').localeCompare(b.letter || '')
-            })
-    }, [cards])
-
-    const kindCounts = useMemo(() => {
-        const counts = { all: rows.length }
-        for (const row of rows) {
-            counts[row.kind] = (counts[row.kind] || 0) + 1
-        }
-        return counts
-    }, [rows])
-
-    const filteredRows = useMemo(() => {
-        if (kindFilter === 'all') return rows
-        return rows.filter((row) => row.kind === kindFilter)
-    }, [kindFilter, rows])
+    const { kindFilter, setKindFilter, filteredRows, kindCounts, rows } = useBrowseCards(cards)
 
     const handleRowSelect = useCallback((id) => {
         setSelectedId((prev) => (prev === id ? null : id))
     }, [])
 
     return (
-        <div className="browse-panel">
-            <div className="browse-toolbar">
-                <div>
-                    <div className="browse-title">Browse cards</div>
-                    <p className="browse-subtitle">Inspect every consonant, vowel, and suffix.</p>
-                </div>
-                <div className="browse-actions">
-                    <div className="browse-filters" role="group" aria-label="Filter by card kind">
-                        {['all', 'consonant', 'vowel', 'suffix'].map((kind) => (
-                            <button
-                                key={kind}
-                                type="button"
-                                className={`browse-filter ${kindFilter === kind ? 'is-active' : ''}`}
-                                onClick={() => setKindFilter(kind)}
-                            >
-                                {kind === 'all' ? 'All' : kindLabels[kind] || 'Unknown'}
-                                <span className="filter-count">{kindCounts[kind] ?? 0}</span>
-                            </button>
-                        ))}
-                    </div>
-                    <div className="browse-count">{filteredRows.length} shown / {rows.length} total</div>
-                </div>
-            </div>
+        <div className="panel">
+            <BrowseToolbar
+                kindFilter={kindFilter}
+                setKindFilter={setKindFilter}
+                kindCounts={kindCounts}
+                totalCount={rows.length}
+                filteredCount={filteredRows.length}
+            />
 
             <div className="browse-table">
                 <div className="browse-head">
@@ -119,67 +31,12 @@ function BrowseView({ cards }) {
                 </div>
 
                 {filteredRows.map((row) => (
-                    <div key={row.id}>
-                        <div
-                            className={`browse-row ${selectedId === row.id ? 'is-selected' : ''}`}
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => handleRowSelect(row.id)}
-                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleRowSelect(row.id)}
-                        >
-                        <div className="browse-card">
-                            <div className="letter-symbol">{row.letter || '?'}</div>
-                            <div className="letter-meta">
-                                <div className="letter-kind">{kindLabels[row.kind] || 'Unknown'}</div>
-                                {row.meta?.wylie && <div className="letter-wylie">Wylie: {row.meta.wylie}</div>}
-                                {row.meta?.pronunciation && (
-                                    <div className="letter-pron">Pron.: {row.meta.pronunciation}</div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="browse-state">
-                            <span className={`state-pill ${stateClassNames[row.card?.state] || ''}`}>
-                                {stateLabels[row.card?.state] || 'Unknown'}
-                            </span>
-                            <div className="state-subtext">
-                                Reps {row.card?.reps ?? 0} | Lapses {row.card?.lapses ?? 0}
-                            </div>
-                        </div>
-
-                        <div className="browse-due">
-                            <div className="due-main">{row.due ? row.due.toLocaleString() : 'Not scheduled'}</div>
-                            <div className="due-sub">
-                                {row.due
-                                    ? row.intervalSeconds <= 0
-                                        ? 'Due now'
-                                        : `Due in ${formatTime(row.intervalSeconds)}`
-                                    : '--'}
-                            </div>
-                        </div>
-
-                        <div className="browse-metrics">
-                            <div className="metric">
-                                <div className="metric-label">Stability</div>
-                                <div className="metric-value">
-                                    {row.card?.stability != null ? row.card.stability.toFixed(1) : '--'}
-                                </div>
-                            </div>
-                            <div className="metric">
-                                <div className="metric-label">Difficulty</div>
-                                <div className="metric-value">
-                                    {row.card?.difficulty != null ? row.card.difficulty.toFixed(1) : '--'}
-                                </div>
-                            </div>
-                        </div>
-                        </div>
-
-                        {selectedId === row.id && (
-                            <div className="browse-row-detail" onClick={() => setSelectedId(null)}>
-                                <ComponentDetailView kind={row.kind} letter={row.letter} />
-                            </div>
-                        )}
-                    </div>
+                    <BrowseRow
+                        key={row.id}
+                        row={row}
+                        isSelected={selectedId === row.id}
+                        onSelect={handleRowSelect}
+                    />
                 ))}
             </div>
         </div>
@@ -187,3 +44,4 @@ function BrowseView({ cards }) {
 }
 
 export default BrowseView
+

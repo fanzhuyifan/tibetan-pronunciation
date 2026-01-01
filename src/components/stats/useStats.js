@@ -1,4 +1,6 @@
 import { State } from 'ts-fsrs'
+import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
+import { parseCardId } from '../../utils'
 
 export const useStats = (cards) => {
     const now = new Date()
@@ -13,22 +15,22 @@ export const useStats = (cards) => {
     }
 
     const kindCounts = {
-        consonant: 0,
-        vowel: 0,
-        suffix: 0,
+        [KIND_CONSONANT]: 0,
+        [KIND_VOWEL]: 0,
+        [KIND_SUFFIX]: 0,
     }
 
     const stateByKind = {
-        [State.New]: { consonant: 0, vowel: 0, suffix: 0 },
-        [State.Learning]: { consonant: 0, vowel: 0, suffix: 0 },
-        [State.Review]: { consonant: 0, vowel: 0, suffix: 0 },
-        [State.Relearning]: { consonant: 0, vowel: 0, suffix: 0 },
+        [State.New]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
+        [State.Learning]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
+        [State.Review]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
+        [State.Relearning]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
     }
 
     const kindByState = {
-        consonant: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
-        vowel: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
-        suffix: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
+        [KIND_CONSONANT]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
+        [KIND_VOWEL]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
+        [KIND_SUFFIX]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
     }
 
     const counts = new Map()
@@ -36,7 +38,7 @@ export const useStats = (cards) => {
     cards.forEach((card, id) => {
         stateCounts[card.state] = (stateCounts[card.state] || 0) + 1
 
-        const [kind] = id.split(':')
+        const { kind } = parseCardId(id)
         if (kindCounts[kind] !== undefined) {
             kindCounts[kind]++
 
@@ -56,7 +58,7 @@ export const useStats = (cards) => {
             d.setHours(0, 0, 0, 0)
             const key = d.getTime()
 
-            const dayCounts = counts.get(key) || { total: 0, consonant: 0, vowel: 0, suffix: 0 }
+            const dayCounts = counts.get(key) || { total: 0, [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 }
             dayCounts.total++
             if (dayCounts[kind] !== undefined) {
                 dayCounts[kind]++
@@ -72,7 +74,7 @@ export const useStats = (cards) => {
         const d = new Date(today)
         d.setDate(d.getDate() + i)
         const key = d.getTime()
-        const dayCounts = counts.get(key) || { total: 0, consonant: 0, vowel: 0, suffix: 0 }
+        const dayCounts = counts.get(key) || { total: 0, [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 }
 
         let label
         if (i < 2) {
@@ -85,12 +87,13 @@ export const useStats = (cards) => {
         forecastData.push({
             date: d,
             count: dayCounts.total,
-            consonant: dayCounts.consonant,
-            vowel: dayCounts.vowel,
-            suffix: dayCounts.suffix,
+            consonant: dayCounts[KIND_CONSONANT],
+            vowel: dayCounts[KIND_VOWEL],
+            suffix: dayCounts[KIND_SUFFIX],
             label,
         })
     }
+
 
     const maxCount = Math.max(...forecastData.map((d) => d.count), 1)
 

@@ -36,7 +36,7 @@ export const Legend = ({ items }) => (
 )
 
 export const StatCard = ({ label, value, breakdownData, colorMap }) => (
-    <div className="stat-card">
+    <div className="panel-card">
         <div className="stat-label">{label}</div>
         <div className="stat-value">{value}</div>
         <StackedBar

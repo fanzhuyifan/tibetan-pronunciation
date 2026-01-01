@@ -19,7 +19,6 @@
     background: linear-gradient(160deg, #fff 0%, #f8fafc 60%, #eef2ff 100%);
     padding: 0.5rem 0.75rem;
     text-align: center;
-    transition: transform 120ms ease, box-shadow 180ms ease, border-color 120ms ease;
 }
 
 .componentTileVowel {
@@ -37,10 +36,6 @@
 .componentTileActive {
     border-color: #818cf8;
     box-shadow: 0 10px 30px rgba(51, 65, 85, 0.12);
-}
-
-.componentTile:hover {
-    transform: translateY(-1px);
 }
 
 .componentTitle {

@@ -16,15 +16,11 @@
     align-items: center;
     gap: 0.75rem;
 }
-.io-button {
+.btn-icon {
     width: 100%;
-        padding: 0.5rem 0.6rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+}
 
-.io-button svg {
+.btn-icon svg {
     width: 20px;
     height: 20px;
     flex-shrink: 0;

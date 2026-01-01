@@ -21,25 +21,25 @@ function App() {
       <div className="topnav">
         <div className="nav-actions">
           <button
-            className={view === VIEW_TRAINING ? 'active' : ''}
+            className={`btn ${view === VIEW_TRAINING ? 'active' : ''}`}
             onClick={() => setView(VIEW_TRAINING)}
           >
             Training
           </button>
           <button
-            className={view === VIEW_STATS ? 'active' : ''}
+            className={`btn ${view === VIEW_STATS ? 'active' : ''}`}
             onClick={() => setView(VIEW_STATS)}
           >
             Stats
           </button>
           <button
-            className={view === VIEW_BROWSE ? 'active' : ''}
+            className={`btn ${view === VIEW_BROWSE ? 'active' : ''}`}
             onClick={() => setView(VIEW_BROWSE)}
           >
             Browse
           </button>
           <button
-            className={view === VIEW_HELP ? 'active' : ''}
+            className={`btn ${view === VIEW_HELP ? 'active' : ''}`}
             onClick={() => setView(VIEW_HELP)}
           >
             Help

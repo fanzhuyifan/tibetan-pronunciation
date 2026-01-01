@@ -14,7 +14,7 @@ function RatingControls({ showAnswer, predictedNextDueDates, onToggleReveal, onR
     if (!showAnswer) {
         return (
             <footer className="actions">
-                <button className="primary" onClick={onToggleReveal} title="Show answer (Space or Enter)">
+                <button className="btn primary" onClick={onToggleReveal} title="Show answer (Space or Enter)">
                     Show answer
                 </button>
             </footer>
@@ -32,7 +32,7 @@ function RatingControls({ showAnswer, predictedNextDueDates, onToggleReveal, onR
                 return (
                     <button
                         key={btn.rating}
-                        className="secondary rating-btn"
+                        className="btn secondary rating-btn"
                         onClick={() => onRate(btn.rating)}
                     >
                         <div className="rating-label">

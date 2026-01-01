@@ -3,8 +3,7 @@ import {
     applyToneToPronunciation,
     combinePronunciation,
     appendSuffixPronunciation,
-    maybeAdjustVowelPronunciation,
-    effectiveTone,
+    applySuffixAdjustments,
 } from './utils/pronunciation'
 
 // Re-export pronunciation helpers for backwards compatibility.
@@ -12,8 +11,7 @@ export {
     applyToneToPronunciation,
     combinePronunciation,
     appendSuffixPronunciation,
-    maybeAdjustVowelPronunciation,
-    effectiveTone,
+    applySuffixAdjustments,
 } from './utils/pronunciation'
 
 const consonantFromLetter = (letter, consonants) => {
@@ -72,11 +70,11 @@ export const buildSyllable = (base, vowel, suffix = null, consonants = defaultCo
 
     const wylie = `${baseWylie}${vowelWylie}${suffixWylie}`
 
-    const vowelPron = maybeAdjustVowelPronunciation(
-        resolvedVowel.pronunciation || '',
+    const { vowelPron, tone } = applySuffixAdjustments({
+        vowelPron: resolvedVowel.pronunciation || '',
+        baseTone: base.tone || '',
         suffix,
-    )
-    const tone = effectiveTone(base.tone || '', suffix)
+    })
 
     let pron = combinePronunciation(base.base_pronunciation || '', vowelPron)
     pron = applyToneToPronunciation(pron, tone)

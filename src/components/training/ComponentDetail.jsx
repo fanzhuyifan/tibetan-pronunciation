@@ -6,6 +6,7 @@ const ComponentTile = ({ kind, title, letter, onSelect, isActive }) => (
     <button
         type="button"
         className={[
+            'btn',
             styles.componentTile,
             kind === 'vowel' && styles.componentTileVowel,
             kind === 'consonant' && styles.componentTileConsonant,

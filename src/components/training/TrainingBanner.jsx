@@ -15,7 +15,7 @@ function TrainingBanner({
         <div className="training-banner" aria-label="Training stats">
             <div className="banner-row banner-row--labels">
                 <button
-                    className="secondary icon-button io-button"
+                    className="btn btn-icon secondary"
                     onClick={onImportClick}
                     type="button"
                     aria-label="Import YAML"
@@ -30,7 +30,7 @@ function TrainingBanner({
 
             <div className="banner-row banner-row--values">
                 <button
-                    className="secondary icon-button io-button"
+                    className="btn btn-icon secondary"
                     onClick={onExportClick}
                     type="button"
                     aria-label="Export YAML"

@@ -54,6 +54,12 @@ export const effectiveTone = (baseTone, suffix) => {
     return baseTone
 }
 
+export const applySuffixAdjustments = ({ vowelPron, baseTone, suffix }) => {
+    const adjustedVowelPron = maybeAdjustVowelPronunciation(vowelPron, suffix)
+    const tone = effectiveTone(baseTone, suffix)
+    return { vowelPron: adjustedVowelPron, tone }
+}
+
 export default {
     applyToneToPronunciation,
     combinePronunciation,

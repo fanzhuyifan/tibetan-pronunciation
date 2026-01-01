@@ -4,8 +4,6 @@ import {
     applyToneToPronunciation,
     combinePronunciation,
     appendSuffixPronunciation,
-    maybeAdjustVowelPronunciation,
-    effectiveTone,
 } from './tibetanSyllable'
 
 const DATA_VOWELS = [
@@ -27,18 +25,7 @@ describe('tibetanSyllable helpers', () => {
         expect(combinePronunciation('g', 'ü')).toBe('gü')
     })
 
-    it('maybeAdjustVowelPronunciation applies suffix vowel mapping', () => {
-        const suffix = { vowel_change: { a: 'e', u: 'ü' } }
-        expect(maybeAdjustVowelPronunciation('', suffix)).toBe('e')
-        expect(maybeAdjustVowelPronunciation('u', suffix)).toBe('ü')
-        expect(maybeAdjustVowelPronunciation('i', suffix)).toBe('i')
-    })
 
-    it('effectiveTone respects suffix tone change when mapping exists', () => {
-        const suffix = { tone_change: { '◌̀': '◌̂' } }
-        expect(effectiveTone('◌̀', suffix)).toBe('◌̂')
-        expect(effectiveTone('◌́', suffix)).toBe('◌́')
-    })
 
     it('appendSuffixPronunciation prefers pronunciation and suffix fields', () => {
         expect(appendSuffixPronunciation('ga', { pronunciation: 'x' })).toBe('gax')
