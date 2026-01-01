@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { TibetanSyllableFactory } from './tibetanSyllable'
+import {
+    TibetanSyllableFactory,
+    applyToneToPronunciation,
+    combinePronunciation,
+    appendSuffixPronunciation,
+    maybeAdjustVowelPronunciation,
+    effectiveTone,
+} from './tibetanSyllable'
 
 const DATA_VOWELS = [
     ['ི', 'i'],
@@ -7,6 +14,37 @@ const DATA_VOWELS = [
     ['ེ', 'e'],
     ['ོ', 'o'],
 ]
+
+describe('tibetanSyllable helpers', () => {
+    it('applyToneToPronunciation inserts tone after first vowel', () => {
+        expect(applyToneToPronunciation('gu', '◌̅')).toBe('gu\u0305')
+        expect(applyToneToPronunciation('nga', '◌̀')).toBe('nga\u0300')
+    })
+
+    it('combinePronunciation replaces inherent a and appends when needed', () => {
+        expect(combinePronunciation('ga', 'o')).toBe('go')
+        expect(combinePronunciation('ga', 'a')).toBe('ga')
+        expect(combinePronunciation('g', 'ü')).toBe('gü')
+    })
+
+    it('maybeAdjustVowelPronunciation applies suffix vowel mapping', () => {
+        const suffix = { vowel_change: { a: 'e', u: 'ü' } }
+        expect(maybeAdjustVowelPronunciation('', suffix)).toBe('e')
+        expect(maybeAdjustVowelPronunciation('u', suffix)).toBe('ü')
+        expect(maybeAdjustVowelPronunciation('i', suffix)).toBe('i')
+    })
+
+    it('effectiveTone respects suffix tone change when mapping exists', () => {
+        const suffix = { tone_change: { '◌̀': '◌̂' } }
+        expect(effectiveTone('◌̀', suffix)).toBe('◌̂')
+        expect(effectiveTone('◌́', suffix)).toBe('◌́')
+    })
+
+    it('appendSuffixPronunciation prefers pronunciation and suffix fields', () => {
+        expect(appendSuffixPronunciation('ga', { pronunciation: 'x' })).toBe('gax')
+        expect(appendSuffixPronunciation('ga', { suffix: 'm' })).toBe('gam')
+    })
+})
 
 describe('TibetanSyllableFactory', () => {
     let factory
@@ -61,6 +99,12 @@ describe('TibetanSyllableFactory', () => {
     it('combine inherent a', () => {
         const syl = factory.fromParts('ཀ')
         expect(syl.pronunciation).toBe('ga\u0300')
+    })
+
+    it('applies vowel change while preserving tone when suffix does not alter it', () => {
+        const syl = factory.fromParts('ཀ', { vowel: 'ུ', suffix: 'ས' })
+        expect(syl.wylie).toBe('kus')
+        expect(syl.pronunciation).toBe('gü\u0300')
     })
 
     it('all vowels roundtrip', () => {
@@ -164,5 +208,20 @@ describe('TibetanSyllableFactory', () => {
                 expectedPron,
             })
         }
+    })
+
+    it('fromWylie prefers longest consonant match for bare syllable', () => {
+        const syl = factory.fromWylie('kha')
+        expect(syl.letter).toBe('ཁ་')
+        expect(syl.wylie).toBe('kha')
+        expect(syl.pronunciation).toBe('ka\u0300')
+    })
+
+    it('throws on unparsed remainder in wylie input', () => {
+        expect(() => factory.fromWylie('kaabc')).toThrow(/Unparsed remainder/)
+    })
+
+    it('rejects empty tibetan syllable input', () => {
+        expect(() => factory.fromTibetan('')).toThrow('Empty syllable')
     })
 })
