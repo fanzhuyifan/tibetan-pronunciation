@@ -35,10 +35,11 @@ interface LegendItem {
 
 interface LegendProps {
     items: LegendItem[];
+    className?: string;
 }
 
-export const Legend = ({ items }: LegendProps) => (
-    <div className="legend-container">
+export const Legend = ({ items, className = '' }: LegendProps) => (
+    <div className={`legend-container ${className}`}>
         {items.map(({ label, color }) => (
             <div key={label} className="legend-item">
                 <div className="legend-dot" style={{ background: color }} />

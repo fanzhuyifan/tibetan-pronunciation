@@ -95,7 +95,6 @@
 .legend-container {
     display: flex;
     gap: 0.75rem;
-    margin-top: 0.5rem;
     flex-wrap: wrap;
 }
 
@@ -112,4 +111,17 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
+}
+.legend-large .legend-item {
+    font-size: 0.85rem;
+}
+
+.legend-large .legend-dot {
+    width: 8px;
+    height: 8px;
+}
+
+.stats-header {
+    justify-content: center;
+    gap: 0.5rem;
 }
