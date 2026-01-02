@@ -22,7 +22,7 @@ function StatsView({ cards }: StatsViewProps) {
     return (
         <div className="panel">
             <div className="panel-header stats-header">
-                <p className="panel-subtitle">Breakdown by state:</p>
+                <p className="panel-subtitle">States:</p>
                 <Legend
                     className="legend-large"
                     items={[
@@ -61,7 +61,7 @@ function StatsView({ cards }: StatsViewProps) {
                 />
             </div>
             <div className="panel-header stats-header" style={{ marginTop: '2rem' }}>
-                <p className="panel-subtitle">Breakdown by card kind:</p>
+                <p className="panel-subtitle">Card kinds:</p>
                 <Legend
                     className="legend-large"
                     items={[
