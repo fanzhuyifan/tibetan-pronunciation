@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { State, Card } from 'ts-fsrs'
 import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
 import { parseCardId } from '../../utils'
@@ -16,11 +17,13 @@ export interface ForecastItem {
     label: string;
 }
 
-export const useStats = (cards: Map<string, Card>) => {
-    const now = new Date()
-    const today = new Date(now)
-    today.setHours(0, 0, 0, 0)
+export const useStats = (cards: Map<string, Card>, forecastDays: number = 14) => {
+    return useMemo(() => {
+        const now = new Date()
+        const today = new Date(now)
+        today.setHours(0, 0, 0, 0)
 
+    
     const stateCounts: Record<number, number> = {
         [State.New]: 0,
         [State.Learning]: 0,
@@ -84,26 +87,48 @@ export const useStats = (cards: Map<string, Card>) => {
     const forecastData: ForecastItem[] = []
     const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
 
-    for (let i = 0; i < 14; i++) {
-        const d = new Date(today)
-        d.setDate(d.getDate() + i)
-        const key = d.getTime()
-        const dayCounts = counts.get(key) || { total: 0, [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 }
+    const isWeekly = forecastDays > 30
+    const binSize = isWeekly ? 7 : 1
+    const numBins = Math.ceil(forecastDays / binSize)
+
+    for (let i = 0; i < numBins; i++) {
+        const binStart = new Date(today)
+        binStart.setDate(binStart.getDate() + (i * binSize))
+        
+        let binTotal = 0
+        let binConsonant = 0
+        let binVowel = 0
+        let binSuffix = 0
+
+        for (let j = 0; j < binSize; j++) {
+             const d = new Date(binStart)
+             d.setDate(d.getDate() + j)
+             const key = d.getTime()
+             const dayCounts = counts.get(key)
+             if (dayCounts) {
+                 binTotal += dayCounts.total
+                 binConsonant += dayCounts[KIND_CONSONANT] || 0
+                 binVowel += dayCounts[KIND_VOWEL] || 0
+                 binSuffix += dayCounts[KIND_SUFFIX] || 0
+             }
+        }
 
         let label
-        if (i < 2) {
+        if (i < 2 && !isWeekly) {
             const val = rtf.format(i, 'day')
             label = val.charAt(0).toUpperCase() + val.slice(1)
+        } else if (forecastDays <= 14) {
+            label = binStart.toLocaleDateString(undefined, { weekday: 'short' })
         } else {
-            label = d.toLocaleDateString(undefined, { weekday: 'short' })
+            label = binStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
         }
 
         forecastData.push({
-            date: d,
-            count: dayCounts.total,
-            consonant: dayCounts[KIND_CONSONANT],
-            vowel: dayCounts[KIND_VOWEL],
-            suffix: dayCounts[KIND_SUFFIX],
+            date: binStart,
+            count: binTotal,
+            consonant: binConsonant,
+            vowel: binVowel,
+            suffix: binSuffix,
             label,
         })
     }
@@ -119,4 +144,5 @@ export const useStats = (cards: Map<string, Card>) => {
         forecastData,
         maxCount
     }
+    }, [cards, forecastDays])
 }

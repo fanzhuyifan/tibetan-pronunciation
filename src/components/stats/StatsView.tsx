@@ -1,4 +1,5 @@
 import { State, Card } from 'ts-fsrs'
+import { useState } from 'react'
 import { STATE_COLORS, KIND_COLORS, KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
 import './StatsView.css'
 import { Legend, StatCard } from './StatsComponents'
@@ -9,7 +10,17 @@ interface StatsViewProps {
     cards: Map<string, Card>;
 }
 
+const FORECAST_OPTIONS = [
+    { label: 'Next Week', days: 7 },
+    { label: 'Next 2 Weeks', days: 14 },
+    { label: 'Next Month', days: 30 },
+    { label: 'Next 3 Months', days: 90 },
+    { label: 'Next Year', days: 365 },
+]
+
 function StatsView({ cards }: StatsViewProps) {
+    const [forecastDays, setForecastDays] = useState(14)
+
     const {
         stateCounts,
         kindCounts,
@@ -17,7 +28,7 @@ function StatsView({ cards }: StatsViewProps) {
         stateByKind,
         forecastData,
         maxCount
-    } = useStats(cards)
+    } = useStats(cards, forecastDays)
 
     return (
         <div className="panel">
@@ -100,7 +111,31 @@ function StatsView({ cards }: StatsViewProps) {
             </div>
 
             <div style={{ marginTop: '2rem' }}>
-                <ReviewForecast forecastData={forecastData} maxCount={maxCount} />
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                    <select
+                        value={forecastDays}
+                        onChange={(e) => setForecastDays(Number(e.target.value))}
+                        style={{
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '6px',
+                            border: '1px solid #cbd5e1',
+                            fontSize: '0.9rem',
+                            color: '#334155',
+                            backgroundColor: 'white',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        {FORECAST_OPTIONS.map(opt => (
+                            <option key={opt.days} value={opt.days}>{opt.label}</option>
+                        ))}
+                    </select>
+                </div>
+                <ReviewForecast
+                    key={forecastDays}
+                    forecastData={forecastData}
+                    maxCount={maxCount}
+                    periodLabel={FORECAST_OPTIONS.find(o => o.days === forecastDays)?.label || ''}
+                />
             </div>
         </div>
     )
