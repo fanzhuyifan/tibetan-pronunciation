@@ -103,7 +103,6 @@ export interface DeckCandidate {
     kind: string | null;
     letter: string | null;
     reversed: boolean;
-    dueTime?: number;
 }
 
 export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels: Vowel[] = defaultVowels, suffixes: Suffix[] = defaultSuffixes) {
@@ -125,28 +124,24 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
 
     const getNextCard = useCallback(({ predicate = null }: { predicate?: ((c: DeckCandidate) => boolean) | null } = {}): DeckCandidate | null => {
         let best: DeckCandidate | null = null
+        let bestPriority = 99
+        let bestDue = Number.POSITIVE_INFINITY
 
-        stateCards.forEach((card, id) => {
+        for (const [id, card] of stateCards) {
             const { kind, letter, reversed } = parseCardId(id)
             const candidate: DeckCandidate = { id, card, kind, letter, reversed }
 
-            if (predicate && !predicate(candidate)) return
+            if (predicate && !predicate(candidate)) continue
 
-            const dueTime = card?.due ? new Date(card.due).getTime() : Number.POSITIVE_INFINITY
-            if (!best) {
-                best = candidate
-                best.dueTime = dueTime
-                return
-            }
-
-            const bestPriority = KIND_ORDER[best.kind || ''] ?? 99
             const thisPriority = KIND_ORDER[kind || ''] ?? 99
-            const bestDue = best.dueTime ?? (best.card?.due ? new Date(best.card.due).getTime() : Number.POSITIVE_INFINITY)
+            const thisDue = card.due ? new Date(card.due).getTime() : Number.POSITIVE_INFINITY
 
-            if (thisPriority < bestPriority || (thisPriority === bestPriority && dueTime < bestDue)) {
-                best = { ...candidate, dueTime }
+            if (best === null || thisPriority < bestPriority || (thisPriority === bestPriority && thisDue < bestDue)) {
+                best = candidate
+                bestPriority = thisPriority
+                bestDue = thisDue
             }
-        })
+        }
 
         return best
     }, [stateCards])
