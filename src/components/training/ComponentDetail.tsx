@@ -1,4 +1,4 @@
-import { act, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { buildDetail } from './componentDetailUtils'
 import ComponentDetailContent from './ComponentDetailContent'
 import styles from './ComponentDetail.module.css'
@@ -82,8 +82,17 @@ function ComponentDetail({ card }: ComponentDetailProps) {
         <>
             {!detail && (
                 <div className={styles.componentsDiagram} aria-label="Syllable components">
-                    <div className={styles.componentColumn}>
-                        {vowelAbove && vowelComponent}
+                    {card.vowel && (
+                        <div
+                            className={[
+                                styles.vowelCell,
+                                vowelAbove ? styles.vowelAbove : styles.vowelBelow,
+                            ].join(' ')}
+                        >
+                            {vowelComponent}
+                        </div>
+                    )}
+                    <div className={styles.baseCell}>
                         <ComponentTile
                             kind="consonant"
                             title="Base"
@@ -91,10 +100,9 @@ function ComponentDetail({ card }: ComponentDetailProps) {
                             onSelect={(kind) => handleSelect(kind, card.consonant)}
                             isActive={activeKind === 'consonant'}
                         />
-                        {!vowelAbove && vowelComponent}
                     </div>
-                    <div className={styles.componentColumn}>
-                        {card.suffix && (
+                    {card.suffix && (
+                        <div className={styles.suffixCell}>
                             <ComponentTile
                                 kind="suffix"
                                 title="Suffix"
@@ -102,10 +110,10 @@ function ComponentDetail({ card }: ComponentDetailProps) {
                                 onSelect={(kind) => handleSelect(kind, card.suffix)}
                                 isActive={activeKind === 'suffix'}
                             />
-                        )}
-                    </div>
-                    <div className={styles.componentColumn}>
-                        {card.suffix && (
+                        </div>
+                    )}
+                    {card.suffix && (
+                        <div className={styles.secondSuffixCell}>
                             <ComponentTile
                                 kind="secondSuffix"
                                 title="Second suffix"
@@ -113,8 +121,8 @@ function ComponentDetail({ card }: ComponentDetailProps) {
                                 onSelect={(kind) => handleSelect(kind, card.secondSuffix)}
                                 isActive={activeKind === 'secondSuffix'}
                             />
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             )}
             {detail && (
