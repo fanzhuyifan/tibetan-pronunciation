@@ -112,11 +112,11 @@ function ComponentDetail({ card }: ComponentDetailProps) {
                             />
                         </div>
                     )}
-                    {card.suffix && (
+                    {card.secondSuffix && (
                         <div className={styles.secondSuffixCell}>
                             <ComponentTile
                                 kind="secondSuffix"
-                                title="Second suffix"
+                                title="2nd suffix"
                                 letter={card.secondSuffix}
                                 onSelect={(kind) => handleSelect(kind, card.secondSuffix)}
                                 isActive={activeKind === 'secondSuffix'}

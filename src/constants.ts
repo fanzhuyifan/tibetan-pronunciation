@@ -9,7 +9,7 @@ export const KIND_LABELS: Record<string, string> = {
     [KIND_CONSONANT]: 'Consonant',
     [KIND_VOWEL]: 'Vowel',
     [KIND_SUFFIX]: 'Suffix',
-    [KIND_SECOND_SUFFIX]: 'Second suffix',
+    [KIND_SECOND_SUFFIX]: '2nd suffix',
 }
 
 export const KIND_ORDER: Record<string, number> = {
@@ -23,7 +23,7 @@ export const KIND_COLORS: Record<string, string> = {
     [KIND_CONSONANT]: '#3b82f6', // blue-500
     [KIND_VOWEL]: '#10b981',     // emerald-500
     [KIND_SUFFIX]: '#f59e0b',    // amber-500
-    [KIND_SECOND_SUFFIX]: '#6366f1', // indigo-500
+    [KIND_SECOND_SUFFIX]: '#fbbf24', // amber-400
 }
 
 export const STATE_LABELS: Record<number, string> = {

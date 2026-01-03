@@ -65,7 +65,7 @@ function StatsView({ cards }: StatsViewProps) {
                     colorMap={STATE_COLORS}
                 />
                 <StatCard
-                    label="Second suffixes"
+                    label="2nd suffixes"
                     value={kindCounts[KIND_SECOND_SUFFIX]}
                     breakdownData={kindByState[KIND_SECOND_SUFFIX]}
                     colorMap={STATE_COLORS}
@@ -85,7 +85,7 @@ function StatsView({ cards }: StatsViewProps) {
                         { label: 'Consonant', color: KIND_COLORS[KIND_CONSONANT] },
                         { label: 'Vowel', color: KIND_COLORS[KIND_VOWEL] },
                         { label: 'Suffix', color: KIND_COLORS[KIND_SUFFIX] },
-                        { label: 'Second suffix', color: KIND_COLORS[KIND_SECOND_SUFFIX] },
+                        { label: '2nd suffix', color: KIND_COLORS[KIND_SECOND_SUFFIX] },
                     ]}
                 />
             </div>

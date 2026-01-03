@@ -58,7 +58,7 @@ export const ReviewForecast = ({ forecastData, maxCount, periodLabel }: ReviewFo
                                         <div style={{ height: `${(day.suffix / day.count) * 100}%`, backgroundColor: KIND_COLORS[KIND_SUFFIX], width: '100%' }} title={`Suffix: ${day.suffix}`} />
                                     )}
                                     {day.secondSuffix > 0 && (
-                                        <div style={{ height: `${(day.secondSuffix / day.count) * 100}%`, backgroundColor: KIND_COLORS[KIND_SECOND_SUFFIX], width: '100%' }} title={`Second suffix: ${day.secondSuffix}`} />
+                                        <div style={{ height: `${(day.secondSuffix / day.count) * 100}%`, backgroundColor: KIND_COLORS[KIND_SECOND_SUFFIX], width: '100%' }} title={`2nd suffix: ${day.secondSuffix}`} />
                                     )}
                                 </>
                             )}

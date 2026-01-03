@@ -70,7 +70,7 @@ export const buildDetail = (kind: string, letter: string | null): DetailData | n
             const allowed = (ss?.suffixes || []).join(', ') || '—'
 
             return {
-                title: 'Second suffix',
+                title: '2nd suffix',
                 rows: [
                     { label: 'Letter', value: letter || '—' },
                     { label: 'Wylie', value: consonantMeta?.wylie || '—' },
