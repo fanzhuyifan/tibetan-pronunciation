@@ -2,6 +2,7 @@ import YAML from 'yaml'
 import consonantYaml from './consonant.yaml?raw'
 import vowelYaml from './vowel.yaml?raw'
 import suffixYaml from './suffix.yaml?raw'
+import secondSuffixYaml from './2nd_suffix.yaml?raw'
 
 export interface Consonant {
     letter: string;
@@ -26,9 +27,15 @@ export interface Suffix {
     base_pronunciation?: string;
 }
 
+export interface SecondSuffix {
+    letter: string;
+    suffixes: string[];
+}
+
 // Parse YAML source into JS objects so the source of truth stays in YAML.
 const parse = <T>(src: string): T[] => YAML.parse(src) || []
 
 export const consonants = parse<Consonant>(consonantYaml)
 export const vowels = parse<Vowel>(vowelYaml)
 export const suffixes = parse<Suffix>(suffixYaml)
+export const secondSuffixes = parse<SecondSuffix>(secondSuffixYaml)

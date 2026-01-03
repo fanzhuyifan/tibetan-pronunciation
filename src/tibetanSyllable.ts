@@ -1,9 +1,19 @@
-import { consonants as defaultConsonants, vowels as defaultVowels, suffixes as defaultSuffixes, Consonant, Vowel, Suffix } from './data/tibetanData'
+import {
+    consonants as defaultConsonants,
+    vowels as defaultVowels,
+    suffixes as defaultSuffixes,
+    secondSuffixes as defaultSecondSuffixes,
+    Consonant,
+    Vowel,
+    Suffix,
+    SecondSuffix,
+} from './data/tibetanData'
 import {
     applyToneToPronunciation,
     combinePronunciation,
     appendSuffixPronunciation,
     applySuffixAdjustments,
+    effectiveTone,
 } from './utils/pronunciation'
 
 // Re-export pronunciation helpers for backwards compatibility.
@@ -12,6 +22,7 @@ export {
     combinePronunciation,
     appendSuffixPronunciation,
     applySuffixAdjustments,
+    effectiveTone,
 } from './utils/pronunciation'
 
 const consonantFromLetter = (letter: string, consonants: Consonant[]): Consonant | null => {
@@ -24,6 +35,33 @@ const stripWylie = (wylie: string): string => {
 
 const emptyVowel = (): Vowel => ({ letter: '', wylie: '', pronunciation: '' })
 
+const buildSecondSuffixMap = (rules: SecondSuffix[]): Map<string, Set<string>> => {
+    const map = new Map<string, Set<string>>()
+    for (const rule of rules) {
+        map.set(rule.letter, new Set(rule.suffixes))
+    }
+    return map
+}
+
+
+const buildWylieMap = (consonants: Consonant[], vowels: Vowel[]): Map<string, string> => {
+    const wylieMap = new Map<string, string>()
+
+    for (const entry of consonants) {
+        wylieMap.set(entry.wylie, entry.letter)
+        const stripped = stripWylie(entry.wylie)
+        if (stripped !== "") {
+            wylieMap.set(stripped, entry.letter)
+        }
+    }
+
+    for (const vowel of vowels) {
+        wylieMap.set(vowel.wylie, vowel.letter)
+    }
+
+    return wylieMap
+}
+
 export interface TibetanSyllableProps {
     letter: string;
     wylie: string;
@@ -32,6 +70,7 @@ export interface TibetanSyllableProps {
     consonant: string;
     vowel: string | null;
     suffix: string | null;
+    secondSuffix: string | null;
 }
 
 export class TibetanSyllable {
@@ -42,8 +81,9 @@ export class TibetanSyllable {
     consonant: string;
     vowel: string | null;
     suffix: string | null;
+    secondSuffix: string | null;
 
-    constructor({ letter, wylie, pronunciation, tone, consonant, vowel, suffix }: TibetanSyllableProps) {
+    constructor({ letter, wylie, pronunciation, tone, consonant, vowel, suffix, secondSuffix }: TibetanSyllableProps) {
         this.letter = letter
         this.wylie = wylie
         this.pronunciation = pronunciation
@@ -51,6 +91,7 @@ export class TibetanSyllable {
         this.consonant = consonant
         this.vowel = vowel || null
         this.suffix = suffix || null
+        this.secondSuffix = secondSuffix || null
     }
 
     toString() {
@@ -64,35 +105,48 @@ const findEntry = <T>(entries: T[], field: keyof T, value: T[keyof T]): T => {
     throw new Error(`No entry with ${String(field)}=${String(value)}`)
 }
 
-export const buildSyllable = (base: Consonant, vowel: Vowel | null, suffix: Suffix | null = null, consonants: Consonant[] = defaultConsonants): TibetanSyllable => {
+export const buildSyllable = (
+    base: Consonant,
+    vowel: Vowel | null,
+    suffix: Suffix | null = null,
+    consonants: Consonant[] = defaultConsonants,
+    secondSuffix: Suffix | null = null,
+): TibetanSyllable => {
     const resolvedVowel = vowel || emptyVowel()
 
     const baseLetter = base.letter || ''
     const vowelLetter = resolvedVowel.letter || ''
     const suffixLetter = suffix?.letter || ''
+    const secondSuffixLetter = secondSuffix?.letter || ''
 
-    const letterCore = `${baseLetter}${vowelLetter}${suffixLetter}`
-    const letter = letterCore.endsWith('་') ? letterCore : `${letterCore}་`
+    const letter = `${baseLetter}${vowelLetter}${suffixLetter}${secondSuffixLetter}་`
 
     let baseWylie = base.wylie || ''
     const vowelWylie = resolvedVowel.wylie || ''
     let suffixWylie = ''
+    let secondSuffixWylie = ''
 
     if (suffix) {
         suffixWylie = stripWylie(consonantFromLetter(suffix.letter, consonants)?.wylie || '')
+    }
+
+    if (secondSuffix) {
+        secondSuffixWylie = stripWylie(consonantFromLetter(secondSuffix.letter, consonants)?.wylie || '')
     }
 
     if (vowelLetter) {
         baseWylie = stripWylie(baseWylie)
     }
 
-    const wylie = `${baseWylie}${vowelWylie}${suffixWylie}`
+    const wylie = `${baseWylie}${vowelWylie}${suffixWylie}${secondSuffixWylie}`
 
-    const { vowelPron, tone } = applySuffixAdjustments({
+    const toneFromSecond = effectiveTone(base.tone || '', secondSuffix)
+    const { vowelPron, tone: toneFromFirst } = applySuffixAdjustments({
         vowelPron: resolvedVowel.pronunciation || '',
         baseTone: base.tone || '',
         suffix,
     })
+    const tone = secondSuffix ? toneFromSecond : toneFromFirst
 
     let pron = combinePronunciation(base.base_pronunciation || '', vowelPron)
     pron = applyToneToPronunciation(pron, tone)
@@ -106,6 +160,7 @@ export const buildSyllable = (base: Consonant, vowel: Vowel | null, suffix: Suff
         consonant: baseLetter,
         vowel: vowelLetter || null,
         suffix: suffixLetter || null,
+        secondSuffix: secondSuffixLetter || null,
     })
 }
 
@@ -113,100 +168,114 @@ export class TibetanSyllableFactory {
     consonants: Consonant[];
     vowels: Vowel[];
     suffixes: Suffix[];
+    secondSuffixes: SecondSuffix[];
+    allowedSecondSuffixes: Map<string, Set<string>>;
+    vowelLetters: Set<string>;
+    suffixLetters: Set<string>;
+    secondSuffixLetters: Set<string>;
+    wylieMap: Map<string, string>;
 
-    constructor({ consonants = defaultConsonants, vowels = defaultVowels, suffixes = defaultSuffixes }: { consonants?: Consonant[], vowels?: Vowel[], suffixes?: Suffix[] } = {}) {
+    constructor({ consonants = defaultConsonants, vowels = defaultVowels, suffixes = defaultSuffixes, secondSuffixes = defaultSecondSuffixes }: { consonants?: Consonant[], vowels?: Vowel[], suffixes?: Suffix[], secondSuffixes?: SecondSuffix[] } = {}) {
         this.consonants = consonants
         this.vowels = vowels
         this.suffixes = suffixes
+        this.secondSuffixes = secondSuffixes
+        this.allowedSecondSuffixes = buildSecondSuffixMap(secondSuffixes)
+
+        this.vowelLetters = new Set(vowels.map((v) => v.letter))
+        this.suffixLetters = new Set(suffixes.map((s) => s.letter))
+        this.secondSuffixLetters = new Set(secondSuffixes.map((s) => s.letter))
+
+        this.wylieMap = buildWylieMap(this.consonants, this.vowels)
     }
 
-    fromParts(baseLetter: string, { vowel = '', suffix = '' }: { vowel?: string, suffix?: string } = {}): TibetanSyllable {
+    private pickLongestWylieToken(remaining: string): string | null {
+        while (remaining !== '') {
+            if (this.wylieMap.has(remaining)) {
+                return remaining
+            }
+            remaining = remaining.slice(0, -1)
+        }
+        return null
+    }
+
+    private convertWylieToTibetan(wylie: string): string {
+        let remaining = wylie
+        let tibetan = ''
+
+        while (remaining.length > 0) {
+            const match = this.pickLongestWylieToken(remaining)
+            if (!match) {
+                throw new Error(`No tibetan letter for wylie prefix in ${remaining}`)
+            }
+
+            const letter = this.wylieMap.get(match)
+            if (tibetan === '' && this.vowelLetters.has(letter!)) {
+                tibetan += 'ཨ' // implicit initial 'a' consonant
+            }
+
+            tibetan += letter
+            remaining = remaining.slice(match.length)
+        }
+
+        return tibetan
+    }
+
+    resolveSecondSuffix(letter: string, suffixEntry: Suffix | null): Suffix | null {
+        if (!letter) return null
+        if (!suffixEntry) {
+            throw new Error(`Second suffix ${letter} requires a primary suffix`)
+        }
+
+        const allowedSuffixes = this.allowedSecondSuffixes.get(letter)
+        if (!allowedSuffixes || !allowedSuffixes.has(suffixEntry.letter)) {
+            throw new Error(`Second suffix ${letter} is not allowed after ${suffixEntry.letter}`)
+        }
+
+        return findEntry(this.suffixes, 'letter', letter)
+    }
+
+    fromParts(baseLetter: string, { vowel = '', suffix = '', secondSuffix = '' }: { vowel?: string, suffix?: string, secondSuffix?: string } = {}): TibetanSyllable {
         const base = findEntry(this.consonants, 'letter', baseLetter)
 
         const vowelEntry = vowel ? findEntry(this.vowels, 'letter', vowel) : emptyVowel()
         const suffixEntry = suffix ? findEntry(this.suffixes, 'letter', suffix) : null
+        const secondSuffixEntry = this.resolveSecondSuffix(secondSuffix, suffixEntry)
 
-        return buildSyllable(base, vowelEntry, suffixEntry, this.consonants)
+        return buildSyllable(base, vowelEntry, suffixEntry, this.consonants, secondSuffixEntry)
     }
 
     fromTibetan(syllable: string): TibetanSyllable {
         if (!syllable) throw new Error('Empty syllable')
+        let remaining = syllable.endsWith('་') ? syllable.slice(0, -1) : syllable
 
-        let trimmed = syllable
-        if (trimmed.endsWith('་')) {
-            trimmed = trimmed.slice(0, -1)
-        }
+        const baseLetter = remaining[0]
+        remaining = remaining.slice(1)
 
-        const baseLetter = trimmed[0]
-        const remainder = trimmed.slice(1)
-
-        let vowelLetter = ''
-        let suffixLetter = ''
-
-        if (remainder) {
-            if (this.vowels.some((v) => v.letter === remainder[0])) {
-                vowelLetter = remainder[0]
-                suffixLetter = remainder[1] || ''
-            } else {
-                suffixLetter = remainder[0]
+        const take = (set: Set<string>): string => {
+            const ch = remaining[0]
+            if (ch && set.has(ch)) {
+                remaining = remaining.slice(1)
+                return ch
             }
+            return ''
         }
-        return this.fromParts(baseLetter, { vowel: vowelLetter, suffix: suffixLetter })
+
+        const vowelLetter = take(this.vowelLetters)
+        const suffixLetter = take(this.suffixLetters)
+        const secondSuffixLetter = suffixLetter ? take(this.secondSuffixLetters) : ''
+
+        if (remaining) {
+            throw new Error(`Unexpected trailing characters ${remaining} tibetan syllable ${syllable}`)
+        }
+
+        return this.fromParts(baseLetter, { vowel: vowelLetter, suffix: suffixLetter, secondSuffix: secondSuffixLetter })
     }
 
     fromWylie(wylie: string): TibetanSyllable {
         if (!wylie) throw new Error('Empty wylie string')
 
-        let bestEntry: Consonant | null = null
-        let bestToken = ''
-
-        for (const entry of this.consonants) {
-            const tok = entry.wylie || ''
-            const candidates = new Set([tok])
-            candidates.add(stripWylie(tok))
-
-            for (const cand of candidates) {
-                if (wylie.startsWith(cand) && cand.length > bestToken.length) {
-                    bestEntry = entry
-                    bestToken = cand
-                }
-            }
-        }
-
-        if (!bestEntry) {
-            throw new Error(`No consonant for wylie prefix in ${wylie}`)
-        }
-
-        let remaining = wylie.slice(bestToken.length)
-        let vowel: Vowel | null = null
-        let suffix: Suffix | null = null
-
-        if (remaining) {
-            for (const v of this.vowels) {
-                const vw = v.wylie || ''
-                if (vw && remaining.startsWith(vw)) {
-                    vowel = v
-                    remaining = remaining.slice(vw.length)
-                    break
-                }
-            }
-
-            if (remaining) {
-                for (const s of this.suffixes) {
-                    const suffixWylie = stripWylie(consonantFromLetter(s.letter, this.consonants)?.wylie || '')
-                    if (suffixWylie && remaining === suffixWylie) {
-                        suffix = s
-                        remaining = ''
-                        break
-                    }
-                }
-            }
-
-            if (remaining) {
-                throw new Error(`Unparsed remainder ${remaining} in wylie ${wylie}`)
-            }
-        }
-
-        return buildSyllable(bestEntry, vowel, suffix, this.consonants)
+        const tibetan = this.convertWylieToTibetan(wylie)
+        return this.fromTibetan(tibetan)
     }
 }
