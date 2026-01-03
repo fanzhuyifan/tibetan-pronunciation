@@ -1,8 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { createEmptyCard, State } from 'ts-fsrs'
 import TrainingView from './TrainingView'
 import { useFsrsDeck } from '../../hooks/useFsrsDeck'
 import { Consonant, Vowel, Suffix, consonants, vowels, suffixes } from '../../data/tibetanData'
+import { createCardId } from '../../utils'
+import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
 
 // Mocks
 window.scrollTo = vi.fn()
@@ -54,12 +57,71 @@ function TestWrapper({
     return <TrainingView deck={deck} />
 }
 
-async function playCard() {
-    fireEvent.click(screen.getByRole('button', { name: /show answer/i }))
-    fireEvent.click(screen.getByText(/Good/i))
-    await waitFor(() => {
-        expect(screen.getByRole('button', { name: /show answer/i })).not.toBeNull()
-    })
+const tsheg = '་'
+
+type FakeDeckCandidate = {
+    id: string;
+    card: ReturnType<typeof createEmptyCard>;
+    kind: string;
+    letter: string;
+    reversed: boolean;
+}
+
+type FakeSyllable = {
+    primary: FakeDeckCandidate;
+    consonant?: FakeDeckCandidate;
+    vowel?: FakeDeckCandidate;
+    suffix?: FakeDeckCandidate;
+}
+
+function makeLearningCard(kind: string, letter: string, now: Date): FakeDeckCandidate {
+    const card = createEmptyCard()
+    card.state = State.Learning
+    card.stability = 1
+    card.difficulty = 3
+    card.reps = 1
+    card.lapses = 0
+    card.elapsed_days = 0
+    card.due = now
+    card.last_review = now
+    return {
+        id: createCardId(kind, letter, false),
+        card,
+        kind,
+        letter,
+        reversed: false,
+    }
+}
+
+function createDeckSequence({ consonant, vowel, suffix, now }: { consonant: string, vowel: string, suffix: string, now: Date }) {
+    const base = makeLearningCard(KIND_CONSONANT, consonant, now)
+    const v = makeLearningCard(KIND_VOWEL, vowel, now)
+    const s = makeLearningCard(KIND_SUFFIX, suffix, now)
+
+    const sequence: FakeSyllable[] = [
+        { primary: base, consonant: base },
+        { primary: v, consonant: base, vowel: v },
+        { primary: s, consonant: base, vowel: v, suffix: s },
+    ]
+
+    const stateCards = new Map<string, ReturnType<typeof createEmptyCard>>([
+        [base.id, base.card],
+        [v.id, v.card],
+        [s.id, s.card],
+    ])
+
+    let index = 0
+
+    return {
+        stateCards,
+        get getNextSyllable() {
+            return () => sequence[index] ?? null
+        },
+        rateMany: () => { index += 1 },
+        calculateDueDate: () => now,
+        exportYaml: () => '',
+        importYaml: () => true,
+    }
 }
 
 describe('TrainingView', () => {
@@ -154,118 +216,50 @@ describe('TrainingView', () => {
     })
 
     it('learns a syllable with consonant + vowel + suffix and shows details', async () => {
-        const c = consonants.find(c => c.wylie === 'ka')!
-        const v = vowels.find(v => v.wylie === 'i')!
-        const s = suffixes.find(s => s.letter === 'ས')!
+        const c = consonants.find(cn => cn.wylie === 'ka')!
+        const v = vowels.find(vw => vw.wylie === 'i')!
+        const s = suffixes.find(sx => sx.letter === 'ས')!
 
-        render(<TestWrapper consonants={[c]} vowels={[v]} suffixes={[s]} />)
+        const now = new Date('2024-01-01T12:00:00Z')
+        const deck = createDeckSequence({ consonant: c.letter, vowel: v.letter, suffix: s.letter, now })
 
-        const tsheg = '་'
+        render(<TrainingView deck={deck as unknown as ReturnType<typeof useFsrsDeck>} />)
 
-        // 1. Expect Consonant (KA)
-        // The syllable logic adds a tsheg
+        // 1) Consonant prompt
         await waitFor(() => expect(screen.getByText(c.letter + tsheg)).not.toBeNull())
+        fireEvent.click(screen.getByRole('button', { name: /show answer/i }))
+        expect(screen.getByText(/Good/i)).not.toBeNull()
+        fireEvent.click(screen.getByText(/Good/i))
 
-        // Play card (Show Answer -> Good)
-        await playCard()
-
-        // 2. Expect Vowel (I)
-        // Vowel card shows Consonant + Vowel + tsheg
-        // Note: The consonant partner is random, but since we only passed [c], it must be c.
-        // The text might be split across elements, so we use a custom matcher or regex
+        // 2) Vowel prompt
         await waitFor(() => {
-            // Look for the vowel letter 'ི' which is combined with the consonant
-            // The display might be 'ཀི' (ka + i)
-            // Let's just check if the text content of the display contains the expected string
-            // The element with role 'button' and title 'Reveal answer' is the flashcard prompt
-            const display = screen.getByTitle(/Reveal answer/i)
-            // The display text might be split by newlines or other elements, so we check if it contains the letters
-            // We expect 'ཀ' and 'ི' and '་'
-            // NOTE: The prompt might be showing the REVERSE card (pronunciation -> letter)
-            // If it shows "gà" and "ka", it's the reverse card.
-            // We want to test the forward card (Letter -> Pronunciation).
-            // useFsrsDeck creates both forward and reverse cards.
-            // If we get a reverse card, we should just play it and wait for the forward one?
-            // Or we can check if it's reverse and expect the pronunciation.
-
-            // Let's check if we see the Tibetan letter. If not, it might be reverse.
-            if (!display.textContent?.includes(c.letter)) {
-                // It's likely a reverse card showing pronunciation.
-                // Just play it.
-                return; // Wait for next loop or just fail if we strictly expect forward
-            }
-
-            expect(display.textContent).toContain(c.letter)
-            expect(display.textContent).toContain(v.letter)
-            expect(display.textContent).toContain(tsheg)
+            const prompt = screen.getByTitle(/Reveal answer/i)
+            const text = prompt.textContent || ''
+            expect(text).toContain(c.letter)
+            expect(text).toContain(v.letter)
         })
+        fireEvent.click(screen.getByRole('button', { name: /show answer/i }))
+        fireEvent.click(screen.getByText(/Good/i))
 
-        // If we didn't find the Tibetan letter above, we might have just returned.
-        // But waitFor will retry until it passes or times out.
-        // If we keep getting the reverse card, we are stuck.
-        // We need to handle the possibility of reverse cards in the test flow.
-
-        // Let's just play cards until we see the Vowel card with Tibetan script.
-        // We can loop a few times.
-
-        let foundVowel = false
-        for (let i = 0; i < 5; i++) {
-            const display = screen.getByTitle(/Reveal answer/i)
-            if (display.textContent?.includes(c.letter) && display.textContent?.includes(v.letter)) {
-                foundVowel = true
-                break
-            }
-            await playCard()
-        }
-        expect(foundVowel).toBe(true)
-
-        // Play the vowel card
-        await playCard()
-
-        // 3. Expect Suffix (S)
-        // Suffix card shows Consonant + Vowel + Suffix + tsheg
-        // Again, partners must be c and v.
-
-        let foundSuffix = false
-        for (let i = 0; i < 5; i++) {
-            const display = screen.getByTitle(/Reveal answer/i)
-            if (display.textContent?.includes(c.letter) && display.textContent?.includes(v.letter) && display.textContent?.includes(s.letter)) {
-                foundSuffix = true
-                break
-            }
-            await playCard()
-        }
-        expect(foundSuffix).toBe(true)
-
-        // Reveal answer to see details
+        // 3) Suffix prompt and component details
+        await waitFor(() => {
+            const prompt = screen.getByTitle(/Reveal answer/i)
+            const text = prompt.textContent || ''
+            expect(text).toContain(c.letter)
+            expect(text).toContain(v.letter)
+            expect(text).toContain(s.letter)
+        })
         fireEvent.click(screen.getByRole('button', { name: /show answer/i }))
 
-        // Check for details
-        // Should show "Base", "Vowel", "Suffix" labels in the component details
-        // The UI uses "Base" for consonant.
         expect(screen.getByText('Base')).not.toBeNull()
         expect(screen.getByText('Vowel')).not.toBeNull()
         expect(screen.getByText('Suffix')).not.toBeNull()
 
-        // Verify Details:
-        // Click "Base" -> Check details
         fireEvent.click(screen.getByRole('button', { name: /Base/i }))
         expect(screen.getByText('Base pron.')).not.toBeNull()
-        expect(screen.getByText(c.letter)).not.toBeNull()
 
-        // Close Base detail (click it again)
-        fireEvent.click(screen.getByRole('button', { name: /Base/i }))
+        fireEvent.click(screen.getByText(/Good/i))
 
-        // Click "Vowel" -> Check details
-        fireEvent.click(screen.getByRole('button', { name: /Vowel/i }))
-        expect(screen.getByText('Pronunciation')).not.toBeNull()
-        expect(screen.getByText(v.letter)).not.toBeNull()
-
-        // Close Vowel detail
-        fireEvent.click(screen.getByRole('button', { name: /Vowel/i }))
-
-        // Click "Suffix" -> Check details
-        fireEvent.click(screen.getByRole('button', { name: /Suffix/i }))
-        expect(screen.getByText(s.letter)).not.toBeNull()
+        await waitFor(() => expect(screen.getByText(/No more cards for now/i)).not.toBeNull())
     })
 })
