@@ -32,6 +32,7 @@ interface SyllableParts {
     consonant?: DeckCandidate | null;
     vowel?: DeckCandidate | null;
     suffix?: DeckCandidate | null;
+    secondSuffix?: DeckCandidate | null;
 }
 
 const buildCurrentSyllable = (factory: TibetanSyllableFactory, parts: SyllableParts | null): TibetanSyllable | null => {
@@ -39,6 +40,7 @@ const buildCurrentSyllable = (factory: TibetanSyllableFactory, parts: SyllablePa
     return factory.fromParts(parts.consonant.letter, {
         vowel: parts.vowel?.letter || '',
         suffix: parts.suffix?.letter || '',
+        secondSuffix: parts.secondSuffix?.letter || '',
     })
 }
 
@@ -110,7 +112,7 @@ export function useTrainingSession(deck: DeckInterface) {
             if (!syllable || !rateMany) return
 
             const targets: string[] = []
-            const keys: (keyof SyllableParts)[] = ['consonant', 'vowel', 'suffix']
+            const keys: (keyof SyllableParts)[] = ['consonant', 'vowel', 'suffix', 'secondSuffix']
 
             keys.forEach(key => {
                 const variant = syllable[key];

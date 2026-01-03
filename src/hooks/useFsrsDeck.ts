@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
 import { createEmptyCard, fsrs, generatorParameters, Card, Rating, Grade } from 'ts-fsrs'
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml'
-import { consonants as defaultConsonants, vowels as defaultVowels, suffixes as defaultSuffixes, Consonant, Vowel, Suffix } from '../data/tibetanData'
+import { consonants as defaultConsonants, vowels as defaultVowels, suffixes as defaultSuffixes, secondSuffixes as defaultSecondSuffixes, Consonant, Vowel, Suffix, SecondSuffix } from '../data/tibetanData'
 import { storageAvailable, createCardId, parseCardId } from '../utils'
-import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_ORDER } from '../constants'
+import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_ORDER, KIND_SECOND_SUFFIX } from '../constants'
 
 const STORAGE_KEY = 'tibetanFsrsDeck'
 
@@ -46,7 +46,7 @@ const hydrateCard = (card: SerializedCard): Card => {
     } as Card
 }
 
-const ensureDeck = (consonants: Consonant[], vowels: Vowel[], suffixes: Suffix[], existingCards: Map<string, Card>): Map<string, Card> => {
+const ensureDeck = (consonants: Consonant[], vowels: Vowel[], suffixes: Suffix[], secondSuffixes: SecondSuffix[], existingCards: Map<string, Card>): Map<string, Card> => {
     const cards = new Map<string, Card>()
 
     const addLetters = (items: { letter: string }[] = [], kind: string) => {
@@ -64,13 +64,14 @@ const ensureDeck = (consonants: Consonant[], vowels: Vowel[], suffixes: Suffix[]
     addLetters(consonants, KIND_CONSONANT)
     addLetters(vowels, KIND_VOWEL)
     addLetters(suffixes, KIND_SUFFIX)
+    addLetters(secondSuffixes, KIND_SECOND_SUFFIX)
 
     return cards
 }
 
-const loadDeck = (consonants: Consonant[], vowels: Vowel[], suffixes: Suffix[]): Map<string, Card> => {
+const loadDeck = (consonants: Consonant[], vowels: Vowel[], suffixes: Suffix[], secondSuffixes: SecondSuffix[]): Map<string, Card> => {
     if (!storageAvailable()) {
-        return ensureDeck(consonants, vowels, suffixes, new Map())
+        return ensureDeck(consonants, vowels, suffixes, secondSuffixes, new Map())
     }
 
     try {
@@ -89,11 +90,12 @@ const loadDeck = (consonants: Consonant[], vowels: Vowel[], suffixes: Suffix[]):
             consonants,
             vowels,
             suffixes,
+            secondSuffixes,
             new Map(cardEntries),
         )
     } catch (error) {
         console.warn('Failed to load FSRS deck, rebuilding', error)
-        return ensureDeck(consonants, vowels, suffixes, new Map())
+        return ensureDeck(consonants, vowels, suffixes, secondSuffixes, new Map())
     }
 }
 
@@ -105,13 +107,26 @@ export interface DeckCandidate {
     reversed: boolean;
 }
 
-export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels: Vowel[] = defaultVowels, suffixes: Suffix[] = defaultSuffixes) {
+export function useFsrsDeck(
+    consonants: Consonant[] = defaultConsonants,
+    vowels: Vowel[] = defaultVowels,
+    suffixes: Suffix[] = defaultSuffixes,
+    secondSuffixes: SecondSuffix[] = defaultSecondSuffixes,
+) {
     const scheduler = useMemo(
         () => fsrs(generatorParameters()),
         [],
     )
-    const cards = loadDeck(consonants, vowels, suffixes)
+    const cards = loadDeck(consonants, vowels, suffixes, secondSuffixes)
     const [stateCards, setStateCards] = useState<Map<string, Card>>(cards)
+
+    const allowedSecondSuffixes = useMemo(() => {
+        const map = new Map<string, Set<string>>()
+        secondSuffixes.forEach(({ letter, suffixes: allowed }) => {
+            map.set(letter, new Set(allowed))
+        })
+        return map
+    }, [secondSuffixes])
 
     const persistDeck = useCallback((value: Map<string, Card>) => {
         if (!storageAvailable() || !value) return
@@ -196,7 +211,7 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
                 nextCards.set(id, hydrateCard(card))
             })
 
-            const ensured = ensureDeck(consonants, vowels, suffixes, nextCards)
+            const ensured = ensureDeck(consonants, vowels, suffixes, secondSuffixes, nextCards)
             persistDeck(ensured)
             setStateCards(ensured)
             return true
@@ -204,20 +219,20 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
             console.warn('Failed to import FSRS deck from YAML', error)
             return false
         }
-    }, [consonants, vowels, suffixes, persistDeck])
+    }, [consonants, vowels, suffixes, secondSuffixes, persistDeck])
 
     function getNextSyllable(predicate: ((c: DeckCandidate) => boolean) | null = null) {
         const nextCard = getNextCard({ predicate })
         if (!nextCard) return null
         const { kind, reversed } = nextCard
 
-        const partner = (targetKind: string): DeckCandidate | null => {
+        const partner = (targetKind: string, { allowedLetters }: { allowedLetters?: Set<string> } = {}): DeckCandidate | null => {
             const candidates: DeckCandidate[] = []
             stateCards.forEach((card, id) => {
                 const { kind: k, letter, reversed: r } = parseCardId(id)
-                if (k === targetKind && r === reversed) {
-                    candidates.push({ id, card, kind: k, letter, reversed: r })
-                }
+                if (k !== targetKind || r !== reversed) return
+                if (allowedLetters && (!letter || !allowedLetters.has(letter))) return
+                candidates.push({ id, card, kind: k, letter, reversed: r })
             })
             if (candidates.length === 0) return null
             if (targetKind === KIND_VOWEL) {
@@ -244,6 +259,21 @@ export function useFsrsDeck(consonants: Consonant[] = defaultConsonants, vowels:
                     consonant: partner(KIND_CONSONANT),
                     vowel: partner(KIND_VOWEL),
                 }
+            case KIND_SECOND_SUFFIX: {
+                const allowed = allowedSecondSuffixes.get(nextCard.letter || '')
+
+                const suffix = partner(KIND_SUFFIX, { allowedLetters: allowed })
+                const consonant = partner(KIND_CONSONANT)
+                const vowel = partner(KIND_VOWEL)
+
+                return {
+                    primary: nextCard,
+                    secondSuffix: nextCard,
+                    suffix,
+                    consonant,
+                    vowel,
+                }
+            }
             default:
                 return null
         }

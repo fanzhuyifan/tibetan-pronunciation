@@ -1,6 +1,6 @@
 import { State, Card } from 'ts-fsrs'
 import { useState } from 'react'
-import { STATE_COLORS, KIND_COLORS, KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
+import { STATE_COLORS, KIND_COLORS, KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_SECOND_SUFFIX } from '../../constants'
 import './StatsView.css'
 import { Legend, StatCard } from './StatsComponents'
 import { ReviewForecast } from './ReviewForecast'
@@ -65,6 +65,12 @@ function StatsView({ cards }: StatsViewProps) {
                     colorMap={STATE_COLORS}
                 />
                 <StatCard
+                    label="Second suffixes"
+                    value={kindCounts[KIND_SECOND_SUFFIX]}
+                    breakdownData={kindByState[KIND_SECOND_SUFFIX]}
+                    colorMap={STATE_COLORS}
+                />
+                <StatCard
                     label="Total"
                     value={Object.values(stateCounts).reduce((a, b) => a + b, 0)}
                     breakdownData={stateCounts}
@@ -79,6 +85,7 @@ function StatsView({ cards }: StatsViewProps) {
                         { label: 'Consonant', color: KIND_COLORS[KIND_CONSONANT] },
                         { label: 'Vowel', color: KIND_COLORS[KIND_VOWEL] },
                         { label: 'Suffix', color: KIND_COLORS[KIND_SUFFIX] },
+                        { label: 'Second suffix', color: KIND_COLORS[KIND_SECOND_SUFFIX] },
                     ]}
                 />
             </div>

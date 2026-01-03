@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { State, Card } from 'ts-fsrs'
-import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from '../../constants'
+import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_SECOND_SUFFIX } from '../../constants'
 import { parseCardId } from '../../utils'
 
 interface DayCounts {
@@ -14,6 +14,7 @@ export interface ForecastItem {
     consonant: number;
     vowel: number;
     suffix: number;
+    secondSuffix: number;
     label: string;
 }
 
@@ -35,19 +36,21 @@ export const useStats = (cards: Map<string, Card>, forecastDays: number = 14) =>
         [KIND_CONSONANT]: 0,
         [KIND_VOWEL]: 0,
         [KIND_SUFFIX]: 0,
+        [KIND_SECOND_SUFFIX]: 0,
     }
 
     const stateByKind: Record<number, Record<string, number>> = {
-        [State.New]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
-        [State.Learning]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
-        [State.Review]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
-        [State.Relearning]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 },
+        [State.New]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0, [KIND_SECOND_SUFFIX]: 0 },
+        [State.Learning]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0, [KIND_SECOND_SUFFIX]: 0 },
+        [State.Review]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0, [KIND_SECOND_SUFFIX]: 0 },
+        [State.Relearning]: { [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0, [KIND_SECOND_SUFFIX]: 0 },
     }
 
     const kindByState: Record<string, Record<number, number>> = {
         [KIND_CONSONANT]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
         [KIND_VOWEL]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
         [KIND_SUFFIX]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
+        [KIND_SECOND_SUFFIX]: { [State.New]: 0, [State.Learning]: 0, [State.Review]: 0, [State.Relearning]: 0 },
     }
 
     const counts = new Map<number, DayCounts>()
@@ -74,7 +77,7 @@ export const useStats = (cards: Map<string, Card>, forecastDays: number = 14) =>
                 d.setHours(0, 0, 0, 0)
                 const key = d.getTime()
 
-                const dayCounts = counts.get(key) || { total: 0, [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0 }
+                const dayCounts = counts.get(key) || { total: 0, [KIND_CONSONANT]: 0, [KIND_VOWEL]: 0, [KIND_SUFFIX]: 0, [KIND_SECOND_SUFFIX]: 0 }
                 dayCounts.total++
                 if (dayCounts[kind] !== undefined) {
                     dayCounts[kind]++
@@ -99,6 +102,7 @@ export const useStats = (cards: Map<string, Card>, forecastDays: number = 14) =>
         let binConsonant = 0
         let binVowel = 0
         let binSuffix = 0
+        let binSecondSuffix = 0
 
         for (let j = 0; j < binSize; j++) {
              const d = new Date(binStart)
@@ -110,6 +114,7 @@ export const useStats = (cards: Map<string, Card>, forecastDays: number = 14) =>
                  binConsonant += dayCounts[KIND_CONSONANT] || 0
                  binVowel += dayCounts[KIND_VOWEL] || 0
                  binSuffix += dayCounts[KIND_SUFFIX] || 0
+                 binSecondSuffix += dayCounts[KIND_SECOND_SUFFIX] || 0
              }
         }
 
@@ -129,6 +134,7 @@ export const useStats = (cards: Map<string, Card>, forecastDays: number = 14) =>
             consonant: binConsonant,
             vowel: binVowel,
             suffix: binSuffix,
+            secondSuffix: binSecondSuffix,
             label,
         })
     }

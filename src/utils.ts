@@ -1,5 +1,5 @@
-import { consonants, vowels, suffixes, Consonant, Vowel, Suffix } from './data/tibetanData'
-import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX } from './constants'
+import { consonants, vowels, suffixes, secondSuffixes, Consonant, Vowel, Suffix, SecondSuffix } from './data/tibetanData'
+import { KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_SECOND_SUFFIX } from './constants'
 
 export const storageAvailable = (): boolean => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
 
@@ -28,13 +28,14 @@ export const parseCardId = (id: string | null | undefined): { kind: string | nul
     return { kind, letter, reversed: revTag === 'rev' }
 }
 
-export type TibetanData = Consonant | Vowel | Suffix;
+export type TibetanData = Consonant | Vowel | Suffix | SecondSuffix;
 
 export const lookupMeta = (kind: string | null, letter: string | null): TibetanData | null => {
     if (!letter) return null
     if (kind === KIND_CONSONANT) return consonants.find((c) => c.letter === letter) || null
     if (kind === KIND_VOWEL) return vowels.find((v) => v.letter === letter) || null
     if (kind === KIND_SUFFIX) return suffixes.find((s) => s.letter === letter) || null
+    if (kind === KIND_SECOND_SUFFIX) return secondSuffixes.find((s) => s.letter === letter) || null
     return null
 }
 

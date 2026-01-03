@@ -6,6 +6,7 @@ import { useFsrsDeck } from './useFsrsDeck'
 const consonants = [{ letter: 'k' }]
 const vowels = [{ letter: 'a' }]
 const suffixes = [{ letter: 's' }]
+const secondSuffixes = [{ letter: 'z', suffixes: ['s'] }]
 
 const storageKey = 'tibetanFsrsDeck'
 
@@ -41,12 +42,12 @@ describe('useFsrsDeck', () => {
     })
 
     it('initializes a card for each letter kind (forward and reverse)', () => {
-        const { result } = renderHook(() => useFsrsDeck(consonants, vowels, suffixes))
-        expect(result.current.stateCards.size).toBe(6)
+        const { result } = renderHook(() => useFsrsDeck(consonants, vowels, suffixes, secondSuffixes))
+        expect(result.current.stateCards.size).toBe(8)
     })
 
     it('returns the next syllable with prioritized consonant', () => {
-        const { result } = renderHook(() => useFsrsDeck(consonants, vowels, suffixes))
+        const { result } = renderHook(() => useFsrsDeck(consonants, vowels, suffixes, secondSuffixes))
         const next = result.current.getNextSyllable()
 
         expect(next?.primary?.kind).toBe('consonant')
@@ -55,7 +56,7 @@ describe('useFsrsDeck', () => {
     })
 
     it('rates cards, updates state, and persists deck', () => {
-        const { result } = renderHook(() => useFsrsDeck(consonants, vowels, suffixes))
+        const { result } = renderHook(() => useFsrsDeck(consonants, vowels, suffixes, secondSuffixes))
         const primary = result.current.getNextSyllable()?.primary
         expect(primary).toBeTruthy()
 

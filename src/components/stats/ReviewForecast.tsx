@@ -1,10 +1,5 @@
+import { KIND_COLORS, KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_SECOND_SUFFIX } from '../../constants'
 import { ForecastItem } from './useStats'
-
-const KIND_COLORS = {
-    consonant: '#3b82f6', // blue-500
-    vowel: '#10b981',     // emerald-500
-    suffix: '#f59e0b',    // amber-500
-}
 
 interface ReviewForecastProps {
     forecastData: ForecastItem[];
@@ -54,13 +49,16 @@ export const ReviewForecast = ({ forecastData, maxCount, periodLabel }: ReviewFo
                             {day.count > 0 && (
                                 <>
                                     {day.consonant > 0 && (
-                                        <div style={{ height: `${(day.consonant / day.count) * 100}%`, backgroundColor: KIND_COLORS.consonant, width: '100%' }} title={`Consonant: ${day.consonant}`} />
+                                        <div style={{ height: `${(day.consonant / day.count) * 100}%`, backgroundColor: KIND_COLORS[KIND_CONSONANT], width: '100%' }} title={`Consonant: ${day.consonant}`} />
                                     )}
                                     {day.vowel > 0 && (
-                                        <div style={{ height: `${(day.vowel / day.count) * 100}%`, backgroundColor: KIND_COLORS.vowel, width: '100%' }} title={`Vowel: ${day.vowel}`} />
+                                        <div style={{ height: `${(day.vowel / day.count) * 100}%`, backgroundColor: KIND_COLORS[KIND_VOWEL], width: '100%' }} title={`Vowel: ${day.vowel}`} />
                                     )}
                                     {day.suffix > 0 && (
-                                        <div style={{ height: `${(day.suffix / day.count) * 100}%`, backgroundColor: KIND_COLORS.suffix, width: '100%' }} title={`Suffix: ${day.suffix}`} />
+                                        <div style={{ height: `${(day.suffix / day.count) * 100}%`, backgroundColor: KIND_COLORS[KIND_SUFFIX], width: '100%' }} title={`Suffix: ${day.suffix}`} />
+                                    )}
+                                    {day.secondSuffix > 0 && (
+                                        <div style={{ height: `${(day.secondSuffix / day.count) * 100}%`, backgroundColor: KIND_COLORS[KIND_SECOND_SUFFIX], width: '100%' }} title={`Second suffix: ${day.secondSuffix}`} />
                                     )}
                                 </>
                             )}

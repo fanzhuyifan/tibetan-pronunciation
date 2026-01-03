@@ -1,4 +1,4 @@
-import { consonants, vowels, suffixes, Consonant, Vowel, Suffix } from '../../data/tibetanData'
+import { consonants, vowels, suffixes, secondSuffixes, Consonant, Vowel, Suffix, SecondSuffix } from '../../data/tibetanData'
 import { TibetanData } from '../../utils'
 
 export const formatMapping = (mapping: Record<string, string> | undefined): string => {
@@ -12,6 +12,7 @@ const dataByKind: Record<string, TibetanData[]> = {
     consonant: consonants,
     vowel: vowels,
     suffix: suffixes,
+    secondSuffix: secondSuffixes,
 }
 
 export interface DetailRow {
@@ -61,6 +62,23 @@ export const buildDetail = (kind: string, letter: string | null): DetailData | n
                     { label: 'Note', value: s?.comment || '—' },
                 ].filter((row): row is DetailRow => Boolean(row)),
             }
+        case 'secondSuffix': {
+            const ss = meta as SecondSuffix | undefined
+            const consonantMeta = consonants.find((c) => c.letter === letter)
+            const suffixMeta = suffixes.find((suf) => suf.letter === letter)
+            const tone = formatMapping(suffixMeta?.tone_change) || '—'
+            const allowed = (ss?.suffixes || []).join(', ') || '—'
+
+            return {
+                title: 'Second suffix',
+                rows: [
+                    { label: 'Letter', value: letter || '—' },
+                    { label: 'Wylie', value: consonantMeta?.wylie || '—' },
+                    { label: 'After', value: allowed },
+                    { label: 'Tone', value: tone },
+                ].filter((row): row is DetailRow => Boolean(row)),
+            }
+        }
         default:
             return null
     }

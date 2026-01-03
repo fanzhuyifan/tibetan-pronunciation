@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { act, useMemo, useState } from 'react'
 import { buildDetail } from './componentDetailUtils'
 import ComponentDetailContent from './ComponentDetailContent'
 import styles from './ComponentDetail.module.css'
@@ -40,14 +40,18 @@ function ComponentDetail({ card }: ComponentDetailProps) {
 
     const detail = useMemo(() => {
         if (!card || !activeKind) return null
-        const letter =
-            activeKind === 'consonant'
-                ? card.consonant
-                : activeKind === 'vowel'
-                    ? card.vowel
-                    : card.suffix
-        if (!letter) return null
-        return buildDetail(activeKind, letter)
+        switch (activeKind) {
+            case 'consonant':
+                return buildDetail(activeKind, card.consonant)
+            case 'vowel':
+                return buildDetail(activeKind, card.vowel)
+            case 'suffix':
+                return buildDetail(activeKind, card.suffix)
+            case 'secondSuffix':
+                return buildDetail(activeKind, card.secondSuffix)
+            default:
+                return null
+        }
     }, [activeKind, card])
 
     if (!card) return null
@@ -89,15 +93,28 @@ function ComponentDetail({ card }: ComponentDetailProps) {
                         />
                         {!vowelAbove && vowelComponent}
                     </div>
-                    {card.suffix && (
-                        <ComponentTile
-                            kind="suffix"
-                            title="Suffix"
-                            letter={card.suffix}
-                            onSelect={(kind) => handleSelect(kind, card.suffix)}
-                            isActive={activeKind === 'suffix'}
-                        />
-                    )}
+                    <div className={styles.componentColumn}>
+                        {card.suffix && (
+                            <ComponentTile
+                                kind="suffix"
+                                title="Suffix"
+                                letter={card.suffix}
+                                onSelect={(kind) => handleSelect(kind, card.suffix)}
+                                isActive={activeKind === 'suffix'}
+                            />
+                        )}
+                    </div>
+                    <div className={styles.componentColumn}>
+                        {card.suffix && (
+                            <ComponentTile
+                                kind="secondSuffix"
+                                title="Second suffix"
+                                letter={card.secondSuffix}
+                                onSelect={(kind) => handleSelect(kind, card.secondSuffix)}
+                                isActive={activeKind === 'secondSuffix'}
+                            />
+                        )}
+                    </div>
                 </div>
             )}
             {detail && (

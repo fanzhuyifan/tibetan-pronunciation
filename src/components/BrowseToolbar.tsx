@@ -1,4 +1,4 @@
-import { KIND_LABELS } from '../constants'
+import { KIND_LABELS, KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_SECOND_SUFFIX } from '../constants'
 
 interface BrowseToolbarProps {
     kindFilter: string;
@@ -16,7 +16,7 @@ export const BrowseToolbar = ({ kindFilter, setKindFilter, kindCounts, totalCoun
             </div>
             <div className="browse-actions">
                 <div className="browse-filters" role="group" aria-label="Filter by card kind">
-                    {['all', 'consonant', 'vowel', 'suffix'].map((kind) => (
+                    {['all', KIND_CONSONANT, KIND_VOWEL, KIND_SUFFIX, KIND_SECOND_SUFFIX].map((kind) => (
                         <button
                             key={kind}
                             type="button"
